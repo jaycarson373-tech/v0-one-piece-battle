@@ -1,36 +1,69 @@
-import { ArrowUpRight } from "lucide-react"
+import { ArrowUpRight, Swords, Inbox } from "lucide-react"
 import { battleFeed, arenaFeed } from "@/lib/data"
+import { EmptyState } from "@/components/empty-state"
 
 function FeedCard({
   title,
   cta,
+  empty,
   children,
 }: {
   title: string
   cta: string
+  empty: boolean
   children: React.ReactNode
 }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className="font-heading text-sm font-extrabold uppercase tracking-wider text-foreground">{title}</h3>
-        <a href="#" className="text-xs font-semibold text-primary hover:underline">
+      <div className="mb-3 flex items-center justify-between border-b border-border pb-3">
+        <h3 className="flex items-center gap-2 font-display text-base uppercase tracking-wide text-foreground">
+          <span className="live-pulse inline-block h-2 w-2 rounded-full bg-primary" />
+          {title}
+        </h3>
+        <a href="#" className="text-xs font-bold uppercase tracking-wider text-primary hover:underline">
           {cta} →
         </a>
       </div>
-      <ul className="divide-y divide-border">{children}</ul>
-      <button className="mt-3 w-full rounded-lg border border-border py-2 text-xs font-semibold text-muted-foreground transition-colors hover:bg-secondary">
-        See more (10 more)
-      </button>
+      {empty ? (
+        <EmptyState
+          icon={Inbox}
+          title="No battles yet"
+          description="Results will appear here the moment the first battle is settled on-chain."
+          className="border-0 bg-transparent py-8"
+        />
+      ) : (
+        <ul className="divide-y divide-border">{children}</ul>
+      )}
     </div>
   )
 }
 
 export function BattleFeeds() {
   return (
-    <section id="battles" className="mx-auto max-w-6xl px-4 py-12">
+    <section id="battles" className="relative overflow-hidden">
+      {/* Luffy battle backdrop */}
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <img
+          src="/images/op-luffy-art.jpeg"
+          alt=""
+          aria-hidden="true"
+          className="h-full w-full object-cover object-right opacity-20"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-background" />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-6xl px-4 py-12">
+      <div className="mb-6 flex items-center gap-3">
+        <Swords className="h-6 w-6 text-primary" />
+        <h2 className="font-display text-2xl uppercase tracking-wide text-foreground sm:text-3xl">
+          The Battlefield
+        </h2>
+        <span className="ml-auto rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-primary">
+          Live results
+        </span>
+      </div>
       <div className="grid gap-4 lg:grid-cols-2">
-        <FeedCard title="1v1 Battles" cta="Play a 1v1">
+        <FeedCard title="1v1 Battles" cta="Play a 1v1" empty={battleFeed.length === 0}>
           {battleFeed.map((b, i) => (
             <li key={i} className="flex items-center justify-between gap-2 py-2.5 text-sm">
               <span className="flex min-w-0 items-center gap-2">
@@ -52,7 +85,7 @@ export function BattleFeeds() {
           ))}
         </FeedCard>
 
-        <FeedCard title="Slab Arena" cta="Enter the Arena">
+        <FeedCard title="Slab Arena" cta="Enter the Arena" empty={arenaFeed.length === 0}>
           {arenaFeed.map((a, i) => (
             <li key={i} className="flex items-center justify-between gap-2 py-2.5 text-sm">
               <span className="flex min-w-0 items-center gap-2">
@@ -72,6 +105,7 @@ export function BattleFeeds() {
             </li>
           ))}
         </FeedCard>
+      </div>
       </div>
     </section>
   )

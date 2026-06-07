@@ -24,8 +24,8 @@ export function SiteHeader() {
               className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               {link.label}
-              {link.label === "Bounties" && (
-                <span className="ml-1 inline-block h-1.5 w-1.5 rounded-full bg-primary align-middle" />
+              {link.label === "Live Arena" && (
+                <span className="ml-1 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-primary align-middle" />
               )}
             </a>
           ))}

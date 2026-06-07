@@ -1,26 +1,13 @@
 export const navLinks = [
-  { label: "Battle", href: "#battles" },
-  { label: "Vault", href: "#vault" },
-  { label: "Earn", href: "#burn" },
-  { label: "Bounties", href: "#bounties" },
-  { label: "Transparency", href: "#numbers" },
-  { label: "How it works", href: "#how" },
-  { label: "Profile", href: "#" },
+  { label: "Live Arena", href: "/arena" },
+  { label: "Vault", href: "/#vault" },
+  { label: "How it works", href: "/#how" },
+  { label: "Dashboard", href: "/dashboard" },
 ]
 
-export const heroStats = [
-  { value: "$3,328", label: "Net Revenue" },
-  { value: "952", label: "Battles Settled" },
-  { value: "$16,030", label: "Paid Out in Cards", accent: true },
-]
+export const heroModes = ["1v1 Battle", "Slab Duel", "Slab Arena", "Pirate Vault"]
 
-export const heroSubStats = [
-  { value: "$6,010", label: "Treasury Value" },
-  { value: "78", label: "Cards in Vault" },
-  { value: "$10", label: "Entry" },
-]
-
-export const heroModes = ["1v1 Battle", "Slab Duel", "Slab Arena", "Pirate Vault", "Bounties"]
+export const battleTicker: string[] = []
 
 export type Rarity = "MYTHIC" | "LEGENDARY" | "RARE" | "COMMON"
 
@@ -32,56 +19,13 @@ export type Card = {
   value: number
 }
 
-export const vaultCards: Card[] = [
-  { name: "Monkey D. Luffy Gear 5 — Alt Art", set: "OP05 #119", grade: "PSA 10", rarity: "MYTHIC", value: 1480 },
-  { name: "Shanks — Leader Parallel", set: "OP01 #120", grade: "PSA 10", rarity: "LEGENDARY", value: 940 },
-  { name: "Roronoa Zoro — Manga Rare", set: "OP06 #069", grade: "CGC 10", rarity: "LEGENDARY", value: 820 },
-  { name: "Boa Hancock — Full Art", set: "OP02 #088", grade: "PSA 9", rarity: "RARE", value: 525 },
-  { name: "Trafalgar Law — Parallel", set: "OP01 #047", grade: "CGC 10", rarity: "RARE", value: 410 },
-  { name: "Portgas D. Ace — Alt Art", set: "OP02 #013", grade: "PSA 8", rarity: "RARE", value: 360 },
-  { name: "Nami — Super Rare", set: "OP01 #016", grade: "PSA 9", rarity: "RARE", value: 290 },
-  { name: "Sanji — Full Art", set: "OP03 #056", grade: "PSA 9", rarity: "COMMON", value: 246 },
-  { name: "Nico Robin — Holo", set: "OP04 #082", grade: "CGC 10", rarity: "COMMON", value: 210 },
-  { name: "Tony Tony Chopper — Holo", set: "OP01 #033", grade: "PSA 9", rarity: "COMMON", value: 190 },
-  { name: "Brook — Reverse Foil", set: "OP05 #061", grade: "PSA 8", rarity: "COMMON", value: 165 },
-  { name: "Usopp — Holo", set: "OP02 #044", grade: "CGC 9", rarity: "COMMON", value: 140 },
-]
+export const vaultCards: Card[] = []
 
-export const rarityCounts = { ALL: 78, MYTHIC: 1, LEGENDARY: 2, RARE: 4, COMMON: 71 }
+export const rarityCounts = { ALL: 0, MYTHIC: 0, LEGENDARY: 0, RARE: 0, COMMON: 0 }
 
-export const battleFeed = [
-  { winner: "GomuKing", loser: "lost vs", card: "Trafalgar Law", value: 13, ago: "15m ago" },
-  { winner: "RedHair__", loser: "won from", card: "Portgas D. Ace", value: 13, ago: "1h ago" },
-  { winner: "SunnyGoes", loser: "won 2024 #047 Sanji Full Art from", card: "Nami", value: 15, ago: "3h ago" },
-  { winner: "GrandLineX", loser: "won 2023 #260 Boa Hancock from", card: "Robin", value: 17, ago: "3h ago" },
-]
+export const battleFeed: { winner: string; loser: string; card: string; value: number; ago: string }[] = []
 
-export const arenaFeed = [
-  { name: "Nico Robin", set: "$46 def. Chopper", value: 13, ago: "8m ago" },
-  { name: "Usopp", set: "$48 def. Brook", value: 16, ago: "22m ago" },
-  { name: "Franky", set: "$49 def. Jinbe", value: 13, ago: "44m ago" },
-  { name: "Boa Hancock", set: "$48 def. Perona", value: 17, ago: "1h ago" },
-]
-
-export const livePayouts = [
-  { rank: "#01", name: "Tony Tony Chopper", code: "GRLN · 3m ago", value: 21 },
-  { rank: "#02", name: "Usopp", code: "8RYP · 5m ago", value: 16 },
-  { rank: "#03", name: "Franky", code: "Byb2 · 9m ago", value: 48, proof: true },
-  { rank: "#04", name: "Trafalgar Law", code: "4yRW · 15m ago", value: 13, proof: true },
-  { rank: "#05", name: "Portgas D. Ace", code: "GRLN · 18m ago", value: 20 },
-  { rank: "#06", name: "Boa Hancock — Full Art", code: "Byb2 · 24m ago", value: 16 },
-  { rank: "#07", name: "Nami", code: "8RYP · 28m ago", value: 16, proof: true },
-  { rank: "#08", name: "Roronoa Zoro", code: "A9aN · 31m ago", value: 13 },
-  { rank: "#09", name: "Sanji Full Art", code: "APDq · 39m ago", value: 15, proof: true },
-  { rank: "#10", name: "Shanks — Leader", code: "APDq · 44m ago", value: 37, proof: true },
-]
-
-export const burnStats = [
-  { value: "$2", label: "Pending", sub: "updates live" },
-  { value: "$331", label: "Lifetime Burned", sub: "220 burns" },
-  { value: "1.08M $BERI", label: "Tokens Removed", sub: "on-chain" },
-  { value: "4,717", label: "SOL Spent", sub: "across all burns" },
-]
+export const arenaFeed: { name: string; set: string; value: number; ago: string }[] = []
 
 export const faqs = [
   {
@@ -103,9 +47,9 @@ export const faqs = [
 ]
 
 export const howSteps = [
-  { step: "01", title: "Pay entry", body: "Drop $10 in SOL to enter a battle or spin the vault for a graded One Piece slab." },
-  { step: "02", title: "1v1 coin flip", body: "Verifiable VRF coin flip decides the winner instantly — settled on-chain." },
-  { step: "03", title: "Winner takes a card", body: "The victor claims the slab as an NFT, redeemable for the physical graded card." },
+  { step: "01", title: "Two holders drawn", body: "Every round, two random slab-holders are pulled from a verifiable on-chain snapshot." },
+  { step: "02", title: "They battle", body: "The two pirates clash in a live duel and one winner is chosen at random via Solana VRF." },
+  { step: "03", title: "Winner takes the prize", body: "The victor wins the round's prize — a live pack opening or a real graded One Piece slab, airdropped instantly." },
 ]
 
 export const rarityTiers = [
@@ -114,3 +58,29 @@ export const rarityTiers = [
   { tier: "RARE", note: "insured $300–1k", color: "var(--ocean)" },
   { tier: "COMMON", note: "insured <$300", color: "var(--muted-foreground)" },
 ]
+
+// ---- Dashboard data ----
+
+export const captain = {
+  handle: "Your Crew",
+  wallet: "Connect wallet",
+  rank: "Unranked",
+  joined: "Connect your wallet to begin",
+  winRate: 0,
+  battles: 0,
+  wins: 0,
+  losses: 0,
+}
+
+export const captainStats = [
+  { label: "Slabs Held", value: "—", sub: "in your vault" },
+  { label: "Vault Value", value: "—", sub: "insured", accent: true },
+  { label: "Battles Won", value: "—", sub: "of 0" },
+  { label: "Net P/L", value: "—", sub: "all-time", accent: true },
+]
+
+export const myCards: Card[] = []
+
+export const myBattles: { result: string; you: string; vs: string; card: string; value: number; ago: string }[] = []
+
+export const leaderboard: { rank: number; handle: string; title: string; wins: number; value: number; you?: boolean }[] = []
