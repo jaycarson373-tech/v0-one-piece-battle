@@ -12,9 +12,9 @@ export function HowItWorks() {
           src="/images/op-treasure-battle.jpeg"
           alt=""
           aria-hidden="true"
-          className="h-full w-full object-cover object-center opacity-25"
+          className="h-full w-full object-cover object-center opacity-55"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/45 to-background/90" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 py-16">
