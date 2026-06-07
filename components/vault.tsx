@@ -27,7 +27,19 @@ export function Vault() {
   })
 
   return (
-    <section id="vault" className="mx-auto max-w-6xl px-4 py-12">
+    <section id="vault" className="relative overflow-hidden border-y-2 border-gold/30">
+      {/* Straw Hat crew backdrop */}
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <img
+          src="/images/op-crew-pose.jpeg"
+          alt=""
+          aria-hidden="true"
+          className="h-full w-full object-cover object-top"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/92 to-background" />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-6xl px-4 py-12">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 font-heading text-3xl font-extrabold text-foreground">
@@ -124,6 +136,7 @@ export function Vault() {
         <button className="rounded-full border border-border bg-card px-6 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary">
           Show 70 more cards
         </button>
+      </div>
       </div>
     </section>
   )
