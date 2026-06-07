@@ -40,7 +40,19 @@ function FeedCard({
 
 export function BattleFeeds() {
   return (
-    <section id="battles" className="mx-auto max-w-6xl px-4 py-12">
+    <section id="battles" className="relative overflow-hidden">
+      {/* Luffy battle backdrop */}
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <img
+          src="/images/op-luffy-art.jpeg"
+          alt=""
+          aria-hidden="true"
+          className="h-full w-full object-cover object-right opacity-20"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-background" />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-6xl px-4 py-12">
       <div className="mb-6 flex items-center gap-3">
         <Swords className="h-6 w-6 text-primary" />
         <h2 className="font-display text-2xl uppercase tracking-wide text-foreground sm:text-3xl">
@@ -93,6 +105,7 @@ export function BattleFeeds() {
             </li>
           ))}
         </FeedCard>
+      </div>
       </div>
     </section>
   )

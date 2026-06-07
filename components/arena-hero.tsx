@@ -1,5 +1,5 @@
-import { Swords } from "lucide-react"
-import { arenaStats, cadenceTiers } from "@/lib/arena"
+import { Swords, MapPin, Clock } from "lucide-react"
+import { arenaStats } from "@/lib/arena"
 
 export function ArenaHero() {
   return (
@@ -51,13 +51,25 @@ export function ArenaHero() {
           ))}
         </div>
 
-        <div className="mx-auto mt-5 flex max-w-xl flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
-          <span className="font-semibold uppercase tracking-wider text-foreground">Cadence scales with volume:</span>
-          {cadenceTiers.map((t) => (
-            <span key={t.volume} className="rounded-full border border-border bg-secondary px-3 py-1">
-              {t.volume} → <span className="font-semibold text-foreground">{t.cadence}</span>
-            </span>
-          ))}
+        <div className="mx-auto mt-8 grid max-w-xl gap-3 sm:grid-cols-2">
+          <div className="flex items-center gap-3 rounded-2xl border border-gold/40 bg-card/80 p-4 text-left shadow-lg backdrop-blur">
+            <MapPin className="h-6 w-6 shrink-0 text-gold" strokeWidth={2.5} />
+            <div>
+              <div className="text-[10px] font-bold uppercase tracking-widest text-gold">Where</div>
+              <div className="font-heading text-sm font-extrabold text-foreground">
+                The Colosseum, live on Solana
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 rounded-2xl border border-gold/40 bg-card/80 p-4 text-left shadow-lg backdrop-blur">
+            <Clock className="h-6 w-6 shrink-0 text-primary" strokeWidth={2.5} />
+            <div>
+              <div className="text-[10px] font-bold uppercase tracking-widest text-primary">When</div>
+              <div className="font-heading text-sm font-extrabold text-foreground">
+                Every 15–60 min, around the clock
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>

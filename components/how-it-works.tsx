@@ -9,7 +9,7 @@ export function HowItWorks() {
       {/* Showdown backdrop */}
       <div className="pointer-events-none absolute inset-0 z-0">
         <img
-          src="/images/op-showdown.webp"
+          src="/images/op-treasure-battle.jpeg"
           alt=""
           aria-hidden="true"
           className="h-full w-full object-cover object-center opacity-25"
