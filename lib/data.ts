@@ -5,7 +5,7 @@ export const navLinks = [
   { label: "Bounties", href: "/#bounties" },
   { label: "Transparency", href: "/#numbers" },
   { label: "How it works", href: "/#how" },
-  { label: "Profile", href: "#" },
+  { label: "Dashboard", href: "/dashboard" },
 ]
 
 export const tokenStats = {
@@ -124,4 +124,51 @@ export const rarityTiers = [
   { tier: "LEGENDARY", note: "insured $5k–1k", color: "var(--primary)" },
   { tier: "RARE", note: "insured $300–1k", color: "var(--ocean)" },
   { tier: "COMMON", note: "insured <$300", color: "var(--muted-foreground)" },
+]
+
+// ---- Dashboard data ----
+
+export const captain = {
+  handle: "GomuKing",
+  wallet: "7xKp…SaME",
+  rank: "Yonko",
+  bounty: 1480000000,
+  joined: "Joined East Blue · OP01",
+  winRate: 58,
+  battles: 124,
+  wins: 72,
+  losses: 52,
+}
+
+export const captainStats = [
+  { label: "Slabs Held", value: "9", sub: "in your vault" },
+  { label: "Vault Value", value: "$3,140", sub: "insured", accent: true },
+  { label: "Battles Won", value: "72", sub: "of 124" },
+  { label: "Net P/L", value: "+$612", sub: "all-time", accent: true },
+]
+
+export const myCards: Card[] = [
+  { name: "Roronoa Zoro — Manga Rare", set: "OP06 #069", grade: "CGC 10", rarity: "LEGENDARY", value: 820 },
+  { name: "Boa Hancock — Full Art", set: "OP02 #088", grade: "PSA 9", rarity: "RARE", value: 525 },
+  { name: "Trafalgar Law — Parallel", set: "OP01 #047", grade: "CGC 10", rarity: "RARE", value: 410 },
+  { name: "Nami — Super Rare", set: "OP01 #016", grade: "PSA 9", rarity: "RARE", value: 290 },
+  { name: "Nico Robin — Holo", set: "OP04 #082", grade: "CGC 10", rarity: "COMMON", value: 210 },
+  { name: "Brook — Reverse Foil", set: "OP05 #061", grade: "PSA 8", rarity: "COMMON", value: 165 },
+]
+
+export const myBattles = [
+  { result: "WIN", you: "Roronoa Zoro", vs: "RedHair__", card: "Trafalgar Law", value: 410, ago: "12m ago" },
+  { result: "WIN", you: "Boa Hancock", vs: "SunnyGoes", card: "Nami — Super Rare", value: 290, ago: "2h ago" },
+  { result: "LOSS", you: "Tony Chopper", vs: "GrandLineX", card: "Tony Chopper", value: 190, ago: "5h ago" },
+  { result: "WIN", you: "Nico Robin", vs: "BluejamCo", card: "Usopp — Holo", value: 140, ago: "8h ago" },
+  { result: "LOSS", you: "Brook", vs: "KuroNeko", card: "Brook — Reverse", value: 165, ago: "1d ago" },
+]
+
+export const leaderboard = [
+  { rank: 1, handle: "RedHair__", title: "Yonko", wins: 188, value: 14200 },
+  { rank: 2, handle: "GomuKing", title: "Yonko", wins: 72, value: 3140, you: true },
+  { rank: 3, handle: "SunnyGoes", title: "Supernova", wins: 64, value: 2880 },
+  { rank: 4, handle: "GrandLineX", title: "Supernova", wins: 51, value: 2210 },
+  { rank: 5, handle: "BluejamCo", title: "Warlord", wins: 44, value: 1760 },
+  { rank: 6, handle: "KuroNeko", title: "Warlord", wins: 39, value: 1490 },
 ]
