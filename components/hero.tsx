@@ -36,9 +36,9 @@ export function Hero() {
           </h1>
 
           <p className="mx-auto mt-5 max-w-xl text-pretty leading-relaxed text-muted-foreground lg:mx-0">
-            Two pirates. One graded slab on the line. Pay an entry to spin for a real PSA- or CGC-graded One
-            Piece card, or wager your own against a rival. Winner takes the treasure — settled in SOL,
-            instantly and provably fair.
+            Two random slab-holders are drawn from an on-chain snapshot and thrown into battle. One winner is
+            chosen at random — and they take the prize: a live pack opening or a real PSA/CGC-graded One Piece
+            slab. Settled in SOL, instantly and provably fair.
           </p>
 
           {/* mode pills */}
@@ -83,7 +83,7 @@ export function Hero() {
               How it works
             </a>
           </div>
-          <p className="mt-3 text-xs text-muted-foreground">$10 standard · avg $18 · $25 premium · avg $22</p>
+          <p className="mt-3 text-xs text-muted-foreground">No entry fee · Hold a slab, get drawn · Winner takes the prize</p>
         </div>
 
         {/* right: VS battle graphic */}
@@ -95,11 +95,28 @@ export function Hero() {
               className="h-64 w-full object-cover sm:h-80"
             />
             <div className="slash-lines absolute inset-0 opacity-40" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/50" />
+
+            <div className="absolute inset-x-0 top-3 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-gold">
+              Drawn from on-chain snapshot
+            </div>
+
+            {/* two randomly drawn holder wallets */}
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 rounded-xl border border-ocean/60 bg-background/85 px-3 py-2 backdrop-blur">
+              <div className="text-[9px] font-bold uppercase tracking-wider text-ocean">Holder A</div>
+              <div className="font-mono text-sm font-bold text-foreground">9f2K…D4uM</div>
+            </div>
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 rounded-xl border border-primary/60 bg-background/85 px-3 py-2 text-right backdrop-blur">
+              <div className="text-[9px] font-bold uppercase tracking-wider text-primary">Holder B</div>
+              <div className="font-mono text-sm font-bold text-foreground">Bv7Q…s1Re</div>
+            </div>
+
             {/* VS badge */}
-            <div className="vs-clash absolute left-1/2 top-1/2 flex h-20 w-20 items-center justify-center rounded-full border-4 border-background bg-primary font-display text-3xl text-primary-foreground">
+            <div className="vs-clash absolute left-1/2 top-1/2 flex h-16 w-16 items-center justify-center rounded-full border-4 border-background bg-primary font-display text-2xl text-primary-foreground">
               VS
             </div>
-            <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between bg-gradient-to-t from-black/80 to-transparent p-4">
+
+            <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between p-4">
               <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gold">
                 <span className="live-pulse inline-block h-2 w-2 rounded-full bg-primary" /> Battle in progress
               </div>

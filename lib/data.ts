@@ -77,9 +77,9 @@ export const faqs = [
 ]
 
 export const howSteps = [
-  { step: "01", title: "Pay entry", body: "Drop $10 in SOL to enter a battle or spin the vault for a graded One Piece slab." },
-  { step: "02", title: "1v1 coin flip", body: "Verifiable VRF coin flip decides the winner instantly — settled on-chain." },
-  { step: "03", title: "Winner takes a card", body: "The victor claims the slab as an NFT, redeemable for the physical graded card." },
+  { step: "01", title: "Two holders drawn", body: "Every round, two random slab-holders are pulled from a verifiable on-chain snapshot." },
+  { step: "02", title: "They battle", body: "The two pirates clash in a live duel and one winner is chosen at random via Solana VRF." },
+  { step: "03", title: "Winner takes the prize", body: "The victor wins the round's prize — a live pack opening or a real graded One Piece slab, airdropped instantly." },
 ]
 
 export const rarityTiers = [

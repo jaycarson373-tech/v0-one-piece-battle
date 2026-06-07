@@ -1,7 +1,7 @@
-import { Coins, Swords, Trophy } from "lucide-react"
+import { Users, Swords, Trophy } from "lucide-react"
 import { howSteps, rarityTiers } from "@/lib/data"
 
-const stepIcons = [Coins, Swords, Trophy]
+const stepIcons = [Users, Swords, Trophy]
 
 export function HowItWorks() {
   return (
@@ -53,16 +53,16 @@ export function HowItWorks() {
           <div className="rounded-2xl border border-border bg-card/80 p-6 shadow-sm backdrop-blur">
             <h3 className="font-heading text-lg font-extrabold text-foreground">What is One Piece Battle?</h3>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              One Piece Battle is a 1v1 Solana game where you pay an entry for a 50/50 shot at a real graded One
-              Piece TCG card. The treasury is publicly verifiable on-chain — every card you see above corresponds
-              to a real graded card mapped to its NFT.
+              One Piece Battle is a Solana game where two random slab-holders are drawn each round and battle for
+              a prize. The treasury is publicly verifiable on-chain — every card you see above corresponds to a
+              real graded card mapped to its NFT.
             </p>
           </div>
           <div className="rounded-2xl border border-gold/40 bg-foreground p-6 text-background shadow-sm">
-            <h3 className="font-heading text-lg font-extrabold">Why it&apos;s +EV for pirates</h3>
+            <h3 className="font-heading text-lg font-extrabold">Provably fair, every round</h3>
             <ul className="mt-3 space-y-2 text-sm leading-relaxed text-background/80">
-              <li>• $10 entry vs. an avg drawn card worth more — positive expected value.</li>
-              <li>• Treasury keeps acquiring new graded cards from entry proceeds.</li>
+              <li>• Holders are drawn from a public on-chain snapshot — no hand-picking.</li>
+              <li>• The winner is chosen at random via Solana VRF and the prize is airdropped instantly.</li>
             </ul>
           </div>
         </div>

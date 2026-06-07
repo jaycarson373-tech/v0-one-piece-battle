@@ -26,9 +26,10 @@ export default function ArenaPage() {
                 <Swords className="h-5 w-5" />
               </div>
               <div>
-                <h3 className="font-heading text-lg font-extrabold text-foreground">Duels are coming next</h3>
+                <h3 className="font-heading text-lg font-extrabold text-foreground">Duels are coming soon</h3>
                 <p className="text-sm text-muted-foreground">
-                  Pick your opponent and wager slab-for-slab, head to head. Arena runs while we finish it.
+                  A gym-showdown-style mode: challenge a specific holder and battle slab-for-slab, head to head.
+                  The random arena keeps running while we finish it.
                 </p>
               </div>
             </div>
