@@ -8,6 +8,17 @@ export const navLinks = [
   { label: "Profile", href: "#" },
 ]
 
+export const tokenStats = {
+  symbol: "$BERI",
+  price: 0.00428,
+  change24h: 18.4,
+  marketCap: 4280000,
+  fdv: 6010000,
+  volume24h: 612400,
+  holders: 3942,
+  liquidity: 318200,
+}
+
 export const heroStats = [
   { value: "$3,328", label: "Net Revenue" },
   { value: "952", label: "Battles Settled" },

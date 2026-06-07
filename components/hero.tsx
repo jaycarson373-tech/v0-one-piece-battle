@@ -5,7 +5,19 @@ import { heroStats, heroSubStats, heroModes } from "@/lib/data"
 export function Hero() {
   return (
     <section id="top" className="relative overflow-hidden">
-      <div className="mx-auto max-w-6xl px-4 pb-10 pt-14 text-center sm:pt-20">
+      {/* One Piece island / ocean backdrop */}
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <img
+          src="/images/grand-line-bg.png"
+          alt=""
+          aria-hidden="true"
+          className="h-full w-full object-cover object-center"
+        />
+        {/* keep the top readable, let the ocean/island show toward the bottom */}
+        <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/45 to-background/20" />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-6xl px-4 pb-10 pt-14 text-center sm:pt-20">
         <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg ring-4 ring-gold">
           <Skull className="h-9 w-9" strokeWidth={2.5} />
         </div>
