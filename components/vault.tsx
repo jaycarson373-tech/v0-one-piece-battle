@@ -36,9 +36,9 @@ export function Vault() {
           src="/images/op-luffy-hat.jpeg"
           alt=""
           aria-hidden="true"
-          className="h-full w-full object-cover object-top opacity-60"
+          className="h-full w-full object-cover object-top"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/50 to-background/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/92 to-background" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 py-12">

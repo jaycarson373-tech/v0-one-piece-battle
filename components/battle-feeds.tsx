@@ -47,9 +47,9 @@ export function BattleFeeds() {
           src="/images/op-luffy-art.jpeg"
           alt=""
           aria-hidden="true"
-          className="h-full w-full object-cover object-right opacity-55"
+          className="h-full w-full object-cover object-right opacity-20"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/55 to-background/80" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-background" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 py-12">
