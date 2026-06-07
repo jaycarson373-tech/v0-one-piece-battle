@@ -1,4 +1,4 @@
-import { Swords, Zap } from "lucide-react"
+import { Swords } from "lucide-react"
 import { buttonVariants } from "@/components/ui/button"
 import { heroModes } from "@/lib/data"
 
@@ -15,6 +15,7 @@ export function Hero() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/75 to-background" />
         <div className="absolute inset-0 bg-gradient-to-r from-background/85 via-transparent to-background/85" />
+        <div className="slash-lines absolute inset-0 opacity-60" />
       </div>
 
       <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-10 px-4 pb-14 pt-14 sm:pt-20 lg:grid-cols-[1.1fr_0.9fr]">
@@ -22,7 +23,7 @@ export function Hero() {
         <div className="text-center lg:text-left">
           <div className="mb-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs font-bold uppercase tracking-widest text-muted-foreground lg:justify-start">
             <span className="flex items-center gap-1.5 text-primary">
-              <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-primary" /> Live on Solana
+              <span className="live-pulse inline-block h-2 w-2 rounded-full bg-primary" /> Live on Solana
             </span>
             <span className="text-border">/</span>
             <span>Real Graded Slabs</span>
@@ -31,7 +32,7 @@ export function Hero() {
           </div>
 
           <h1 className="text-balance font-display text-5xl uppercase leading-[0.92] text-foreground text-shadow-poster sm:text-7xl">
-            Enter the <span className="text-primary">Grand Line</span> Arena
+            Two Pirates. <span className="text-primary">One Slab.</span> Winner Takes All.
           </h1>
 
           <p className="mx-auto mt-5 max-w-xl text-pretty leading-relaxed text-muted-foreground lg:mx-0">
@@ -57,7 +58,7 @@ export function Hero() {
           </div>
 
           <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row lg:items-start">
-            <a href="/arena" className={buttonVariants({ size: "lg", className: "gap-2 rounded-full px-8 text-base" })}>
+            <a href="/arena" className={buttonVariants({ size: "lg", className: "strike-hover gap-2 rounded-full px-8 text-base" })}>
               <Swords className="h-5 w-5" />
               Enter the Arena
             </a>
@@ -77,19 +78,20 @@ export function Hero() {
 
         {/* right: VS battle graphic */}
         <div className="relative">
-          <div className="relative overflow-hidden rounded-3xl border-2 border-gold/60 bg-card shadow-2xl shadow-black/40">
+          <div className="battle-glow relative overflow-hidden rounded-3xl border-2 border-gold/60 bg-card shadow-2xl shadow-black/40">
             <img
               src="/images/op-luffy-punch.jpeg"
               alt="One Piece characters clashing in battle"
               className="h-64 w-full object-cover sm:h-80"
             />
+            <div className="slash-lines absolute inset-0 opacity-40" />
             {/* VS badge */}
-            <div className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-4 border-background bg-primary font-display text-2xl text-primary-foreground shadow-xl">
+            <div className="vs-clash absolute left-1/2 top-1/2 flex h-20 w-20 items-center justify-center rounded-full border-4 border-background bg-primary font-display text-3xl text-primary-foreground">
               VS
             </div>
             <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between bg-gradient-to-t from-black/80 to-transparent p-4">
               <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gold">
-                <Zap className="h-3.5 w-3.5" /> Battle in progress
+                <span className="live-pulse inline-block h-2 w-2 rounded-full bg-primary" /> Battle in progress
               </div>
               <span className="rounded-full bg-background/80 px-2.5 py-1 font-mono text-xs font-bold text-foreground">
                 Prize · CGC 10

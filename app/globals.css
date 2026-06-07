@@ -151,4 +151,59 @@
   .text-shadow-poster {
     text-shadow: 0 2px 0 oklch(0.15 0.03 255 / 0.6), 0 6px 24px oklch(0 0 0 / 0.45);
   }
+  /* battle: pulsing red combat glow */
+  .battle-glow {
+    box-shadow: 0 0 0 1px oklch(0.58 0.23 26 / 0.4), 0 0 28px oklch(0.58 0.23 26 / 0.35);
+  }
+  /* battle: animated diagonal action slashes */
+  .slash-lines {
+    background-image: repeating-linear-gradient(
+      -55deg,
+      oklch(1 0 0 / 0.06) 0px,
+      oklch(1 0 0 / 0.06) 2px,
+      transparent 2px,
+      transparent 16px
+    );
+  }
+  /* battle: VS clash pulse */
+  .vs-clash {
+    animation: vs-clash 1.6s ease-in-out infinite;
+  }
+  @keyframes vs-clash {
+    0%, 100% {
+      transform: translate(-50%, -50%) scale(1) rotate(-4deg);
+      box-shadow: 0 0 0 0 oklch(0.58 0.23 26 / 0.55), 0 8px 24px oklch(0 0 0 / 0.5);
+    }
+    50% {
+      transform: translate(-50%, -50%) scale(1.12) rotate(2deg);
+      box-shadow: 0 0 0 14px oklch(0.58 0.23 26 / 0), 0 10px 30px oklch(0 0 0 / 0.6);
+    }
+  }
+  /* battle: live status flicker */
+  .live-pulse {
+    animation: live-pulse 1.2s ease-in-out infinite;
+  }
+  @keyframes live-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.35; transform: scale(0.82); }
+  }
+  /* battle: charged button shake on hover */
+  .strike-hover:hover {
+    animation: strike-shake 0.4s ease-in-out;
+  }
+  @keyframes strike-shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-2px) rotate(-0.5deg); }
+    40% { transform: translateX(2px) rotate(0.5deg); }
+    60% { transform: translateX(-1px); }
+    80% { transform: translateX(1px); }
+  }
+  /* battle: scrolling ticker tape */
+  .marquee-track {
+    animation: marquee 28s linear infinite;
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
 }

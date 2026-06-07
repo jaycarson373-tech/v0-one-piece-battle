@@ -1,4 +1,4 @@
-import { ArrowUpRight } from "lucide-react"
+import { ArrowUpRight, Swords } from "lucide-react"
 import { battleFeed, arenaFeed } from "@/lib/data"
 
 function FeedCard({
@@ -12,9 +12,12 @@ function FeedCard({
 }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className="font-heading text-sm font-extrabold uppercase tracking-wider text-foreground">{title}</h3>
-        <a href="#" className="text-xs font-semibold text-primary hover:underline">
+      <div className="mb-3 flex items-center justify-between border-b border-border pb-3">
+        <h3 className="flex items-center gap-2 font-display text-base uppercase tracking-wide text-foreground">
+          <span className="live-pulse inline-block h-2 w-2 rounded-full bg-primary" />
+          {title}
+        </h3>
+        <a href="#" className="text-xs font-bold uppercase tracking-wider text-primary hover:underline">
           {cta} →
         </a>
       </div>
@@ -29,6 +32,15 @@ function FeedCard({
 export function BattleFeeds() {
   return (
     <section id="battles" className="mx-auto max-w-6xl px-4 py-12">
+      <div className="mb-6 flex items-center gap-3">
+        <Swords className="h-6 w-6 text-primary" />
+        <h2 className="font-display text-2xl uppercase tracking-wide text-foreground sm:text-3xl">
+          The Battlefield
+        </h2>
+        <span className="ml-auto rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-primary">
+          Live results
+        </span>
+      </div>
       <div className="grid gap-4 lg:grid-cols-2">
         <FeedCard title="1v1 Battles" cta="Play a 1v1">
           {battleFeed.map((b, i) => (

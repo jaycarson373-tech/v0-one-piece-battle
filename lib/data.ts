@@ -7,6 +7,15 @@ export const navLinks = [
 
 export const heroModes = ["1v1 Battle", "Slab Duel", "Slab Arena", "Pirate Vault"]
 
+export const battleTicker = [
+  "GomuKing KO'd RedHair__ → won Trafalgar Law (CGC 10)",
+  "SunnyGoes landed a finishing blow → claimed Nami Super Rare",
+  "BluejamCo defeated KuroNeko → took Usopp Holo",
+  "GrandLineX won the duel → Sanji Full Art airdropped",
+  "Zoro_Santoryu critical hit → Boa Hancock Full Art secured",
+  "AceFlame swept the arena → Portgas D. Ace Alt Art",
+]
+
 export type Rarity = "MYTHIC" | "LEGENDARY" | "RARE" | "COMMON"
 
 export type Card = {

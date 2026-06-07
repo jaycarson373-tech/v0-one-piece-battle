@@ -1,5 +1,6 @@
 import { SiteHeader } from "@/components/site-header"
 import { Hero } from "@/components/hero"
+import { BattleTicker } from "@/components/battle-ticker"
 import { BattleFeeds } from "@/components/battle-feeds"
 import { HourlyDraw } from "@/components/hourly-draw"
 import { Vault } from "@/components/vault"
@@ -13,6 +14,7 @@ export default function Page() {
       <SiteHeader />
       <main>
         <Hero />
+        <BattleTicker />
         <BattleFeeds />
         <HourlyDraw />
         <Vault />
