@@ -96,6 +96,25 @@ export const featuredPrize: PrizeCard = {
   value: 410,
 }
 
+// The full prize pool the winner's slab is drawn from — a "pack" of slabs held in
+// the treasury vault. Each battle deterministically draws one card from this pool
+// using the same public seed, so the drop is as verifiable as the matchup itself.
+// `weight` controls drop odds (higher = more common).
+export type PoolCard = PrizeCard & { weight: number }
+
+export const prizePool: PoolCard[] = [
+  { name: "Buggy — Common", set: "OP01 #078", grade: "PSA 9", rarity: "COMMON", value: 35, weight: 40 },
+  { name: "Nami — Uncommon", set: "OP01 #016", grade: "CGC 9.5", rarity: "COMMON", value: 55, weight: 34 },
+  { name: "Usopp — Rare", set: "OP03 #053", grade: "PSA 10", rarity: "RARE", value: 90, weight: 24 },
+  { name: "Sanji — Black Leg", set: "OP01 #024", grade: "CGC 10", rarity: "RARE", value: 140, weight: 18 },
+  { name: "Nico Robin — Full Art", set: "OP02 #088", grade: "PSA 10", rarity: "RARE", value: 190, weight: 14 },
+  { name: "Portgas D. Ace — Fire Fist", set: "OP02 #013", grade: "CGC 10", rarity: "LEGENDARY", value: 310, weight: 9 },
+  { name: "Trafalgar Law — Parallel", set: "OP01 #047", grade: "CGC 10", rarity: "LEGENDARY", value: 410, weight: 6 },
+  { name: "Roronoa Zoro — Manga Rare", set: "OP06 #069", grade: "CGC 10", rarity: "LEGENDARY", value: 820, weight: 3 },
+  { name: "Shanks — Leader Parallel", set: "OP01 #120", grade: "PSA 10", rarity: "MYTHIC", value: 940, weight: 2 },
+  { name: "Monkey D. Luffy — Gear 5 Alt", set: "OP05 #119", grade: "PSA 10", rarity: "MYTHIC", value: 1480, weight: 1 },
+]
+
 // Treasury "grails" we are actively hunting / holding.
 export const treasuryGrails = [
   { name: "Monkey D. Luffy — Gear 5 Alt Art", set: "OP05 #119", grade: "PSA 10", value: 1480, status: "Held" as const },

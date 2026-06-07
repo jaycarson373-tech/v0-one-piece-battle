@@ -1,12 +1,19 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import { Shield, Swords, Sparkles, Plane, CheckCircle2, Dices, Copy, Check } from "lucide-react"
+import { Shield, Swords, Sparkles, CheckCircle2, Dices, Copy, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { eligibleHolders, featuredPrize, type Holder } from "@/lib/arena"
-import { pickIndices, rollBattle, proofHash } from "@/lib/provably-fair"
+import { eligibleHolders, prizePool, type Holder, type PoolCard } from "@/lib/arena"
+import { pickIndices, rollBattle, proofHash, pickWeighted } from "@/lib/provably-fair"
 
 type Phase = "idle" | "snapshot" | "reveal" | "battle" | "result" | "airdrop"
+
+const rarityStyles: Record<PoolCard["rarity"], { ring: string; chip: string; glow: string }> = {
+  MYTHIC: { ring: "ring-primary border-primary", chip: "bg-primary text-primary-foreground", glow: "shadow-[0_0_40px_-8px] shadow-primary" },
+  LEGENDARY: { ring: "ring-gold border-gold", chip: "bg-gold text-gold-foreground", glow: "shadow-[0_0_40px_-8px] shadow-gold" },
+  RARE: { ring: "ring-ocean border-ocean", chip: "bg-ocean text-background", glow: "shadow-[0_0_30px_-10px] shadow-ocean" },
+  COMMON: { ring: "ring-border border-border", chip: "bg-secondary text-muted-foreground", glow: "" },
+}
 
 function shortSeed(s: string) {
   return s.length > 18 ? `${s.slice(0, 10)}…${s.slice(-6)}` : s
@@ -25,6 +32,8 @@ export function LiveArena() {
   const [fighters, setFighters] = useState<[Holder, Holder] | null>(null)
   const [scores, setScores] = useState<{ a: number; b: number } | null>(null)
   const [winner, setWinner] = useState<"a" | "b" | null>(null)
+  const [prize, setPrize] = useState<PoolCard | null>(null)
+  const [prizeRevealed, setPrizeRevealed] = useState(false)
   const [reelOffset, setReelOffset] = useState(0)
   const [copied, setCopied] = useState(false)
   const timers = useRef<ReturnType<typeof setTimeout>[]>([])
@@ -40,6 +49,7 @@ export function LiveArena() {
     setScores(null)
     setWinner(null)
     setReelOffset(0)
+    setPrizeRevealed(false)
 
     // 1) commit a public seed
     const s = makeSeed()
@@ -50,6 +60,10 @@ export function LiveArena() {
     const [iA, iB] = pickIndices(s, eligibleHolders.length, 2)
     const fA = eligibleHolders[iA]
     const fB = eligibleHolders[iB]
+
+    // draw the prize slab for this battle from the treasury pool (same seed)
+    const prizeIdx = pickWeighted(s, prizePool.map((c) => c.weight))
+    setPrize(prizePool[prizeIdx])
 
     timers.current.push(
       setTimeout(() => {
@@ -77,9 +91,10 @@ export function LiveArena() {
       }, 6000),
     )
 
-    // 5) airdrop the prize
+    // 5) reveal the drawn prize pack-opening style, then airdrop
+    timers.current.push(setTimeout(() => setPrizeRevealed(true), 7000))
     timers.current.push(
-      setTimeout(() => setPhase("airdrop"), 8200),
+      setTimeout(() => setPhase("airdrop"), 8600),
     )
   }, [])
 
@@ -114,12 +129,14 @@ export function LiveArena() {
           <div className="flex items-center gap-2 text-sm">
             <Sparkles className="h-4 w-4 text-gold" />
             <span className="text-muted-foreground">On the line:</span>
-            <span className="font-bold text-foreground">{featuredPrize.name}</span>
-            <span className="rounded-full bg-gold px-2 py-0.5 text-[10px] font-bold uppercase text-gold-foreground">
-              {featuredPrize.grade}
+            <span className="font-bold text-foreground">Mystery slab</span>
+            <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold uppercase text-muted-foreground">
+              drawn from the vault
             </span>
           </div>
-          <span className="font-heading text-lg font-extrabold text-primary">${featuredPrize.value}</span>
+          <span className="font-heading text-sm font-extrabold text-muted-foreground">
+            {prizePool.length}-card pool · up to $1,480
+          </span>
         </div>
 
         {/* stage body */}
@@ -190,6 +207,8 @@ export function LiveArena() {
               winner={winner}
               phase={phase}
               seed={seed}
+              prize={prize}
+              prizeRevealed={prizeRevealed}
               onAgain={runBattle}
             />
           )}
@@ -225,6 +244,8 @@ function BattleStage({
   winner,
   phase,
   seed,
+  prize,
+  prizeRevealed,
   onAgain,
 }: {
   fighters: [Holder, Holder]
@@ -232,6 +253,8 @@ function BattleStage({
   winner: "a" | "b" | null
   phase: Phase
   seed: string
+  prize: PoolCard | null
+  prizeRevealed: boolean
   onAgain: () => void
 }) {
   const [a, b] = fighters
@@ -273,11 +296,14 @@ function BattleStage({
             {(winner === "a" ? a : b).character.name} stands victorious
           </p>
 
-          {phase === "airdrop" ? (
+          {/* pack-opening prize reveal */}
+          {prize && <PrizeReveal prize={prize} revealed={prizeRevealed} />}
+
+          {phase === "airdrop" && prize ? (
             <div className="mt-5 flex flex-col items-center gap-2 rounded-2xl border border-border bg-secondary px-6 py-4">
               <div className="flex items-center gap-2 text-sm font-bold text-foreground">
                 <CheckCircle2 className="h-5 w-5 text-ocean" />
-                {featuredPrize.name} airdropped
+                {prize.name} airdropped
               </div>
               <p className="font-mono text-xs text-muted-foreground">
                 → {(winner === "a" ? a : b).wallet} · settled on-chain
@@ -288,13 +314,56 @@ function BattleStage({
               </Button>
             </div>
           ) : (
-            <div className="mt-5 flex items-center gap-2 text-sm text-muted-foreground">
-              <Plane className="h-4 w-4 animate-bounce text-primary" />
-              Airdropping prize to winner…
-            </div>
+            !prizeRevealed && (
+              <div className="mt-5 flex items-center gap-2 text-sm text-muted-foreground">
+                <Sparkles className="h-4 w-4 animate-pulse text-gold" />
+                Cracking the pack…
+              </div>
+            )
           )}
         </div>
       )}
+    </div>
+  )
+}
+
+function PrizeReveal({ prize, revealed }: { prize: PoolCard; revealed: boolean }) {
+  const r = rarityStyles[prize.rarity]
+  return (
+    <div className="mt-6 flex flex-col items-center">
+      <div
+        className={`relative flex h-56 w-40 flex-col items-center justify-center overflow-hidden rounded-2xl border-2 ring-2 transition-all duration-500 ${
+          revealed ? `${r.ring} ${r.glow} scale-100` : "scale-95 border-border ring-border"
+        }`}
+      >
+        {!revealed ? (
+          <div className="flex flex-col items-center gap-2 bg-primary/5 px-3 text-center">
+            <Sparkles className="h-8 w-8 animate-pulse text-gold" />
+            <span className="font-heading text-sm font-extrabold text-muted-foreground">Sealed slab</span>
+          </div>
+        ) : (
+          <div className="flex h-full w-full flex-col bg-card">
+            <div className={`flex items-center justify-center py-1 text-[10px] font-bold uppercase tracking-widest ${r.chip}`}>
+              {prize.rarity}
+            </div>
+            <div className="flex flex-1 flex-col items-center justify-center gap-1 px-3 text-center">
+              <span className="font-heading text-sm font-extrabold leading-tight text-foreground text-balance">
+                {prize.name}
+              </span>
+              <span className="text-[10px] text-muted-foreground">{prize.set}</span>
+              <span className="mt-1 rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold text-foreground">
+                {prize.grade}
+              </span>
+            </div>
+            <div className="border-t border-border py-1.5 font-heading text-lg font-extrabold text-primary">
+              ${prize.value}
+            </div>
+          </div>
+        )}
+      </div>
+      <p className="mt-2 text-xs text-muted-foreground">
+        {revealed ? "Drawn from the treasury vault" : "Verifiable draw from the same seed"}
+      </p>
     </div>
   )
 }

@@ -63,3 +63,18 @@ export function proofHash(seed: string): string {
   const h = fnv1a(seed).toString(16).padStart(8, "0")
   return `0x${h}${fnv1a(seed + h).toString(16).padStart(8, "0")}`
 }
+
+// Deterministically draw one prize from a weighted pool using the same seed.
+// Returns the index of the winning card. Because it derives from a distinct
+// salt (":prize") on the same public seed, the drop is independently verifiable
+// alongside the matchup and battle roll.
+export function pickWeighted(seed: string, weights: number[]): number {
+  const rng = mulberry32(fnv1a(seed + ":prize"))
+  const total = weights.reduce((s, w) => s + w, 0)
+  let roll = rng() * total
+  for (let i = 0; i < weights.length; i++) {
+    roll -= weights[i]
+    if (roll < 0) return i
+  }
+  return weights.length - 1
+}
