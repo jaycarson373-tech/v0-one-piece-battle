@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { Shield, Swords, Sparkles, CheckCircle2, Dices, Copy, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { eligibleHolders, prizePool, type Holder, type PoolCard } from "@/lib/arena"
-import { pickIndices, rollBattle, proofHash, pickWeighted } from "@/lib/provably-fair"
+import { requestBattle, type BattleResult } from "@/lib/battle-resolver"
 
 type Phase = "idle" | "snapshot" | "reveal" | "battle" | "result" | "airdrop"
 
@@ -19,20 +19,12 @@ function shortSeed(s: string) {
   return s.length > 18 ? `${s.slice(0, 10)}…${s.slice(-6)}` : s
 }
 
-// Generate a fresh public seed. In production this is the Solana slot blockhash.
-function makeSeed() {
-  const slot = 296_000_000 + Math.floor(Math.random() * 900_000)
-  const hex = Array.from({ length: 24 }, () => Math.floor(Math.random() * 16).toString(16)).join("")
-  return `slot:${slot}:${hex}`
-}
-
 export function LiveArena() {
   const [phase, setPhase] = useState<Phase>("idle")
-  const [seed, setSeed] = useState<string>("")
-  const [fighters, setFighters] = useState<[Holder, Holder] | null>(null)
-  const [scores, setScores] = useState<{ a: number; b: number } | null>(null)
-  const [winner, setWinner] = useState<"a" | "b" | null>(null)
-  const [prize, setPrize] = useState<PoolCard | null>(null)
+  // The finalized, immutable outcome. The animation only ever *performs* this —
+  // it never decides anything. Mirrors how the real VRF result drives the UI.
+  const [result, setResult] = useState<BattleResult | null>(null)
+  const [showScores, setShowScores] = useState(false)
   const [prizeRevealed, setPrizeRevealed] = useState(false)
   const [reelOffset, setReelOffset] = useState(0)
   const [copied, setCopied] = useState(false)
@@ -44,67 +36,60 @@ export function LiveArena() {
   }
   useEffect(() => () => clearTimers(), [])
 
-  const runBattle = useCallback(() => {
+  const runBattle = useCallback(async () => {
     clearTimers()
-    setScores(null)
-    setWinner(null)
+    setShowScores(false)
     setReelOffset(0)
     setPrizeRevealed(false)
+    setResult(null)
 
-    // 1) commit a public seed
-    const s = makeSeed()
-    setSeed(s)
+    // 1) Request the battle. In production this awaits Solana VRF; the returned
+    //    object is final and tamper-proof before any pixels move.
     setPhase("snapshot")
+    const r = await requestBattle()
+    setResult(r)
 
-    // 2) deterministically select two holders from the eligible pool
-    const [iA, iB] = pickIndices(s, eligibleHolders.length, 2)
-    const fA = eligibleHolders[iA]
-    const fB = eligibleHolders[iB]
-
-    // draw the prize slab for this battle from the treasury pool (same seed)
-    const prizeIdx = pickWeighted(s, prizePool.map((c) => c.weight))
-    setPrize(prizePool[prizeIdx])
-
+    // 2) case-opening reel lands on fighter A's snapshot index
     timers.current.push(
       setTimeout(() => {
         setPhase("reveal")
-        // case-opening reel lands on fighter A's index
-        setReelOffset(iA)
+        setReelOffset(r.fighterAIndex)
       }, 1400),
     )
 
-    // 3) battle animation
+    // 3) reveal both drawn combatants, then clash
     timers.current.push(
       setTimeout(() => {
-        setFighters([fA, fB])
         setPhase("battle")
       }, 3200),
     )
 
-    // 4) settle result deterministically
+    // 4) "ping the winner" — surface the settled scores + victor
     timers.current.push(
       setTimeout(() => {
-        const r = rollBattle(s, fA.character.power, fB.character.power)
-        setScores({ a: r.aScore, b: r.bScore })
-        setWinner(r.winner)
+        setShowScores(true)
         setPhase("result")
       }, 6000),
     )
 
-    // 5) reveal the drawn prize pack-opening style, then airdrop
+    // 5) crack the prize slab, then confirm the airdrop
     timers.current.push(setTimeout(() => setPrizeRevealed(true), 7000))
-    timers.current.push(
-      setTimeout(() => setPhase("airdrop"), 8600),
-    )
+    timers.current.push(setTimeout(() => setPhase("airdrop"), 8600))
   }, [])
 
   const copySeed = () => {
-    navigator.clipboard?.writeText(seed)
+    if (!result) return
+    navigator.clipboard?.writeText(result.seed)
     setCopied(true)
     setTimeout(() => setCopied(false), 1500)
   }
 
   const reel = buildReel()
+  const fighters: [Holder, Holder] | null = result ? [result.fighterA, result.fighterB] : null
+  const scores = showScores && result ? { a: result.scoreA, b: result.scoreB } : null
+  const winner = showScores && result ? result.winner : null
+  const prize = result?.prize ?? null
+  const seed = result?.seed ?? ""
 
   return (
     <section id="arena-stage" className="mx-auto max-w-6xl px-4 py-8">
@@ -161,9 +146,11 @@ export function LiveArena() {
           {phase === "snapshot" && (
             <div className="flex flex-col items-center py-10 text-center">
               <div className="mb-4 h-10 w-10 animate-spin rounded-full border-4 border-secondary border-t-primary" />
-              <p className="font-heading text-lg font-extrabold text-foreground">Capturing on-chain snapshot…</p>
+              <p className="font-heading text-lg font-extrabold text-foreground">Requesting Solana VRF…</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Committing seed {shortSeed(seed)} · {eligibleHolders.length} eligible wallets
+                {seed
+                  ? `Seed committed ${shortSeed(seed)} · ${eligibleHolders.length} eligible wallets`
+                  : `Snapshotting ${eligibleHolders.length} eligible wallets · awaiting randomness`}
               </p>
             </div>
           )}
@@ -225,10 +212,10 @@ export function LiveArena() {
                 {copied ? "copied" : "copy"}
               </button>
             </div>
-            {winner && (
+            {result && winner && (
               <div className="font-mono text-muted-foreground">
                 <span className="font-sans font-semibold uppercase tracking-wider text-foreground">Proof</span>{" "}
-                {proofHash(seed)}
+                {result.proof}
               </div>
             )}
           </div>

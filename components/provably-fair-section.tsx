@@ -3,8 +3,8 @@ import { ShieldCheck, GitBranch, Hash, Camera } from "lucide-react"
 const steps = [
   {
     icon: Camera,
-    title: "1 · On-chain snapshot",
-    body: "At the battle slot we read the Solana blockhash and the full list of slab-holding wallets. The seed is committed on-chain before anything is drawn.",
+    title: "1 · Snapshot + VRF request",
+    body: "At the battle slot we snapshot every slab-holding wallet and request Switchboard On-Demand randomness. The seed is committed on-chain before anything is drawn.",
   },
   {
     icon: Hash,
@@ -37,9 +37,9 @@ export function ProvablyFair() {
           <h2 className="font-heading text-2xl font-extrabold text-foreground">Provably fair, by design</h2>
         </div>
         <p className="max-w-2xl text-pretty text-sm leading-relaxed text-muted-foreground">
-          Every battle is a pure function of a public seed. We publish the exact selection + battle code to
-          GitHub so anyone — including automated agents like Codex — can reproduce any outcome and confirm we
-          never touched the result.
+          Every battle is a pure function of a public seed — the winner is finalized before a single pixel
+          animates. We publish the exact resolver + battle code to GitHub so anyone, including automated agents
+          like Codex, can reproduce any outcome and confirm we never touched the result.
         </p>
 
         <div className="mt-6 grid gap-4 md:grid-cols-3">
