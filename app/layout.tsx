@@ -1,6 +1,6 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono, Baloo_2 } from 'next/font/google'
+import { Geist, Geist_Mono, Baloo_2, Anton } from 'next/font/google'
 import './globals.css'
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
@@ -12,6 +12,11 @@ const baloo = Baloo_2({
   variable: '--font-baloo',
   subsets: ['latin'],
   weight: ['600', '700', '800'],
+})
+const anton = Anton({
+  variable: '--font-anton',
+  subsets: ['latin'],
+  weight: ['400'],
 })
 
 export const metadata: Metadata = {
@@ -44,7 +49,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${baloo.variable} bg-background`}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${baloo.variable} ${anton.variable} bg-background`}>
       <body className="font-sans antialiased">{children}{process.env.NODE_ENV === 'production' && <Analytics />}</body>
     </html>
   )
