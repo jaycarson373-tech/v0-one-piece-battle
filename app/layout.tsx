@@ -20,7 +20,7 @@ const anton = Anton({
 })
 
 export const metadata: Metadata = {
-  title: 'One Piece Battle — Wager graded character slabs. Earn yield in Berries.',
+  title: 'One Piece Battle — Wager real graded character slabs in 1v1 duels.',
   description:
     'Pay an entry to spin for a real graded One Piece TCG slab, or wager your own slab against another pirate. Winner takes the card — settled on-chain, instantly.',
   generator: 'v0.app',

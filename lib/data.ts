@@ -1,37 +1,11 @@
 export const navLinks = [
   { label: "Live Arena", href: "/arena" },
   { label: "Vault", href: "/#vault" },
-  { label: "Earn", href: "/#burn" },
-  { label: "Bounties", href: "/#bounties" },
-  { label: "Transparency", href: "/#numbers" },
   { label: "How it works", href: "/#how" },
   { label: "Dashboard", href: "/dashboard" },
 ]
 
-export const tokenStats = {
-  symbol: "$BERI",
-  price: 0.00428,
-  change24h: 18.4,
-  marketCap: 4280000,
-  fdv: 6010000,
-  volume24h: 612400,
-  holders: 3942,
-  liquidity: 318200,
-}
-
-export const heroStats = [
-  { value: "$3,328", label: "Net Revenue" },
-  { value: "952", label: "Battles Settled" },
-  { value: "$16,030", label: "Paid Out in Cards", accent: true },
-]
-
-export const heroSubStats = [
-  { value: "$6,010", label: "Treasury Value" },
-  { value: "78", label: "Cards in Vault" },
-  { value: "$10", label: "Entry" },
-]
-
-export const heroModes = ["1v1 Battle", "Slab Duel", "Slab Arena", "Pirate Vault", "Bounties"]
+export const heroModes = ["1v1 Battle", "Slab Duel", "Slab Arena", "Pirate Vault"]
 
 export type Rarity = "MYTHIC" | "LEGENDARY" | "RARE" | "COMMON"
 
@@ -74,26 +48,6 @@ export const arenaFeed = [
   { name: "Boa Hancock", set: "$48 def. Perona", value: 17, ago: "1h ago" },
 ]
 
-export const livePayouts = [
-  { rank: "#01", name: "Tony Tony Chopper", code: "GRLN · 3m ago", value: 21 },
-  { rank: "#02", name: "Usopp", code: "8RYP · 5m ago", value: 16 },
-  { rank: "#03", name: "Franky", code: "Byb2 · 9m ago", value: 48, proof: true },
-  { rank: "#04", name: "Trafalgar Law", code: "4yRW · 15m ago", value: 13, proof: true },
-  { rank: "#05", name: "Portgas D. Ace", code: "GRLN · 18m ago", value: 20 },
-  { rank: "#06", name: "Boa Hancock — Full Art", code: "Byb2 · 24m ago", value: 16 },
-  { rank: "#07", name: "Nami", code: "8RYP · 28m ago", value: 16, proof: true },
-  { rank: "#08", name: "Roronoa Zoro", code: "A9aN · 31m ago", value: 13 },
-  { rank: "#09", name: "Sanji Full Art", code: "APDq · 39m ago", value: 15, proof: true },
-  { rank: "#10", name: "Shanks — Leader", code: "APDq · 44m ago", value: 37, proof: true },
-]
-
-export const burnStats = [
-  { value: "$2", label: "Pending", sub: "updates live" },
-  { value: "$331", label: "Lifetime Burned", sub: "220 burns" },
-  { value: "1.08M $BERI", label: "Tokens Removed", sub: "on-chain" },
-  { value: "4,717", label: "SOL Spent", sub: "across all burns" },
-]
-
 export const faqs = [
   {
     q: "Are the cards real?",
@@ -132,7 +86,6 @@ export const captain = {
   handle: "GomuKing",
   wallet: "7xKp…SaME",
   rank: "Yonko",
-  bounty: 1480000000,
   joined: "Joined East Blue · OP01",
   winRate: 58,
   battles: 124,

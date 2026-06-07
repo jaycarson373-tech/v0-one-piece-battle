@@ -1,6 +1,6 @@
 import { Swords, Zap } from "lucide-react"
 import { buttonVariants } from "@/components/ui/button"
-import { heroStats, heroSubStats, heroModes } from "@/lib/data"
+import { heroModes } from "@/lib/data"
 
 export function Hero() {
   return (
@@ -99,18 +99,6 @@ export function Hero() {
           <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 rounded-full border border-gold bg-card px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-gold shadow-lg">
             Next draw · 04:12
           </div>
-        </div>
-      </div>
-
-      {/* stat strip */}
-      <div className="relative z-10 border-t border-border bg-card/50 backdrop-blur">
-        <div className="mx-auto grid max-w-6xl grid-cols-3 divide-x divide-border px-4 sm:grid-cols-6">
-          {[...heroStats, ...heroSubStats].slice(0, 6).map((s) => (
-            <div key={s.label} className="px-3 py-5 text-center">
-              <div className="font-display text-xl text-foreground sm:text-2xl">{s.value}</div>
-              <div className="mt-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{s.label}</div>
-            </div>
-          ))}
         </div>
       </div>
     </section>

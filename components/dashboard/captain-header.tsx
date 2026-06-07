@@ -34,10 +34,8 @@ export function CaptainHeader() {
             <p className="mt-2 text-sm text-muted-foreground">{captain.joined}</p>
           </div>
           <div className="flex flex-col items-center gap-1 rounded-2xl border border-gold/40 bg-card/80 px-6 py-4 backdrop-blur sm:items-end">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Bounty</span>
-            <span className="font-display text-2xl text-gold">
-              {(captain.bounty / 1_000_000).toLocaleString()}M Berries
-            </span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Win Rate</span>
+            <span className="font-display text-2xl text-gold">{captain.winRate}%</span>
             <button className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-xs font-bold text-primary-foreground transition-colors hover:opacity-90">
               <Wallet className="h-3.5 w-3.5" /> Connected
             </button>
