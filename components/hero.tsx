@@ -98,7 +98,7 @@ export function Hero() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/50" />
 
             <div className="absolute inset-x-0 top-3 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-gold">
-              Drawn from on-chain snapshot
+              Demo · Sample matchup
             </div>
 
             {/* two randomly drawn holder wallets */}
@@ -118,7 +118,7 @@ export function Hero() {
 
             <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between p-4">
               <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gold">
-                <span className="live-pulse inline-block h-2 w-2 rounded-full bg-primary" /> Battle in progress
+                <span className="inline-block h-2 w-2 rounded-full bg-gold" /> Example battle
               </div>
               <span className="rounded-full bg-background/80 px-2.5 py-1 font-mono text-xs font-bold text-foreground">
                 Prize · CGC 10

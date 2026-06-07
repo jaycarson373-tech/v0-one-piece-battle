@@ -32,9 +32,6 @@ export function HourlyDraw() {
           <p className="text-pretty text-lg font-extrabold leading-snug text-foreground">
             Two holders drawn. <span className="text-primary">Winner takes a grail.</span>
           </p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Last winner: GomuKing → 2d3x…SaME · $20
-          </p>
         </div>
 
         <div className="flex items-center gap-4">
