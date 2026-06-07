@@ -43,18 +43,28 @@ export function Hero() {
 
           {/* mode pills */}
           <div className="mt-7 flex flex-wrap items-center justify-center gap-2 lg:justify-start">
-            {heroModes.map((m, i) => (
-              <span
-                key={m}
-                className={`rounded-full border px-4 py-1.5 text-sm font-bold ${
-                  i === 0
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-card/70 text-foreground backdrop-blur"
-                }`}
-              >
-                {m}
-              </span>
-            ))}
+            {heroModes.map((m, i) => {
+              const comingSoon = m.toLowerCase().includes("duel")
+              return (
+                <span
+                  key={m}
+                  className={`relative inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-bold ${
+                    comingSoon
+                      ? "border-dashed border-gold/60 bg-card/40 text-muted-foreground backdrop-blur"
+                      : i === 0
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-card/70 text-foreground backdrop-blur"
+                  }`}
+                >
+                  {m}
+                  {comingSoon && (
+                    <span className="rounded-full bg-gold px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-gold-foreground">
+                      Soon
+                    </span>
+                  )}
+                </span>
+              )
+            })}
           </div>
 
           <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row lg:items-start">
