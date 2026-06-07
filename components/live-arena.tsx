@@ -120,7 +120,7 @@ export function LiveArena() {
             </span>
           </div>
           <span className="font-heading text-sm font-extrabold text-muted-foreground">
-            {prizePool.length}-card pool · up to $1,480
+            {prizePool.length > 0 ? `${prizePool.length}-card pool` : "Pool stocking soon"}
           </span>
         </div>
 
@@ -132,14 +132,28 @@ export function LiveArena() {
                 <Swords className="h-7 w-7" />
               </div>
               <h3 className="font-heading text-2xl font-extrabold text-foreground">Two holders. One grail.</h3>
-              <p className="mt-2 max-w-md text-pretty text-sm leading-relaxed text-muted-foreground">
-                Hit start to draw a public seed, snapshot the eligible wallets, and watch two random pirates
-                battle for the slab — settled and airdropped automatically.
-              </p>
-              <Button size="lg" className="mt-6 gap-2 rounded-full px-8" onClick={runBattle}>
-                <Dices className="h-5 w-5" />
-                Run a battle
-              </Button>
+              {eligibleHolders.length === 0 ? (
+                <>
+                  <p className="mt-2 max-w-md text-pretty text-sm leading-relaxed text-muted-foreground">
+                    The arena goes live once wallets start holding One Piece slabs. Battles will draw two random
+                    holders from an on-chain snapshot and settle automatically via Solana VRF.
+                  </p>
+                  <span className="mt-6 rounded-full border border-dashed border-gold/60 bg-card px-5 py-2 text-xs font-bold uppercase tracking-widest text-gold">
+                    Battles start soon
+                  </span>
+                </>
+              ) : (
+                <>
+                  <p className="mt-2 max-w-md text-pretty text-sm leading-relaxed text-muted-foreground">
+                    Hit start to draw a public seed, snapshot the eligible wallets, and watch two random pirates
+                    battle for the slab — settled and airdropped automatically.
+                  </p>
+                  <Button size="lg" className="mt-6 gap-2 rounded-full px-8" onClick={runBattle}>
+                    <Dices className="h-5 w-5" />
+                    Run a battle
+                  </Button>
+                </>
+              )}
             </div>
           )}
 

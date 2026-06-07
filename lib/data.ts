@@ -7,14 +7,7 @@ export const navLinks = [
 
 export const heroModes = ["1v1 Battle", "Slab Duel", "Slab Arena", "Pirate Vault"]
 
-export const battleTicker = [
-  "GomuKing KO'd RedHair__ → won Trafalgar Law (CGC 10)",
-  "SunnyGoes landed a finishing blow → claimed Nami Super Rare",
-  "BluejamCo defeated KuroNeko → took Usopp Holo",
-  "GrandLineX won the duel → Sanji Full Art airdropped",
-  "Zoro_Santoryu critical hit → Boa Hancock Full Art secured",
-  "AceFlame swept the arena → Portgas D. Ace Alt Art",
-]
+export const battleTicker: string[] = []
 
 export type Rarity = "MYTHIC" | "LEGENDARY" | "RARE" | "COMMON"
 
@@ -26,36 +19,13 @@ export type Card = {
   value: number
 }
 
-export const vaultCards: Card[] = [
-  { name: "Monkey D. Luffy Gear 5 — Alt Art", set: "OP05 #119", grade: "PSA 10", rarity: "MYTHIC", value: 1480 },
-  { name: "Shanks — Leader Parallel", set: "OP01 #120", grade: "PSA 10", rarity: "LEGENDARY", value: 940 },
-  { name: "Roronoa Zoro — Manga Rare", set: "OP06 #069", grade: "CGC 10", rarity: "LEGENDARY", value: 820 },
-  { name: "Boa Hancock — Full Art", set: "OP02 #088", grade: "PSA 9", rarity: "RARE", value: 525 },
-  { name: "Trafalgar Law — Parallel", set: "OP01 #047", grade: "CGC 10", rarity: "RARE", value: 410 },
-  { name: "Portgas D. Ace — Alt Art", set: "OP02 #013", grade: "PSA 8", rarity: "RARE", value: 360 },
-  { name: "Nami — Super Rare", set: "OP01 #016", grade: "PSA 9", rarity: "RARE", value: 290 },
-  { name: "Sanji — Full Art", set: "OP03 #056", grade: "PSA 9", rarity: "COMMON", value: 246 },
-  { name: "Nico Robin — Holo", set: "OP04 #082", grade: "CGC 10", rarity: "COMMON", value: 210 },
-  { name: "Tony Tony Chopper — Holo", set: "OP01 #033", grade: "PSA 9", rarity: "COMMON", value: 190 },
-  { name: "Brook — Reverse Foil", set: "OP05 #061", grade: "PSA 8", rarity: "COMMON", value: 165 },
-  { name: "Usopp — Holo", set: "OP02 #044", grade: "CGC 9", rarity: "COMMON", value: 140 },
-]
+export const vaultCards: Card[] = []
 
-export const rarityCounts = { ALL: 78, MYTHIC: 1, LEGENDARY: 2, RARE: 4, COMMON: 71 }
+export const rarityCounts = { ALL: 0, MYTHIC: 0, LEGENDARY: 0, RARE: 0, COMMON: 0 }
 
-export const battleFeed = [
-  { winner: "GomuKing", loser: "lost vs", card: "Trafalgar Law", value: 13, ago: "15m ago" },
-  { winner: "RedHair__", loser: "won from", card: "Portgas D. Ace", value: 13, ago: "1h ago" },
-  { winner: "SunnyGoes", loser: "won 2024 #047 Sanji Full Art from", card: "Nami", value: 15, ago: "3h ago" },
-  { winner: "GrandLineX", loser: "won 2023 #260 Boa Hancock from", card: "Robin", value: 17, ago: "3h ago" },
-]
+export const battleFeed: { winner: string; loser: string; card: string; value: number; ago: string }[] = []
 
-export const arenaFeed = [
-  { name: "Nico Robin", set: "$46 def. Chopper", value: 13, ago: "8m ago" },
-  { name: "Usopp", set: "$48 def. Brook", value: 16, ago: "22m ago" },
-  { name: "Franky", set: "$49 def. Jinbe", value: 13, ago: "44m ago" },
-  { name: "Boa Hancock", set: "$48 def. Perona", value: 17, ago: "1h ago" },
-]
+export const arenaFeed: { name: string; set: string; value: number; ago: string }[] = []
 
 export const faqs = [
   {
@@ -92,45 +62,25 @@ export const rarityTiers = [
 // ---- Dashboard data ----
 
 export const captain = {
-  handle: "GomuKing",
-  wallet: "7xKp…SaME",
-  rank: "Yonko",
-  joined: "Joined East Blue · OP01",
-  winRate: 58,
-  battles: 124,
-  wins: 72,
-  losses: 52,
+  handle: "Your Crew",
+  wallet: "Connect wallet",
+  rank: "Unranked",
+  joined: "Connect your wallet to begin",
+  winRate: 0,
+  battles: 0,
+  wins: 0,
+  losses: 0,
 }
 
 export const captainStats = [
-  { label: "Slabs Held", value: "9", sub: "in your vault" },
-  { label: "Vault Value", value: "$3,140", sub: "insured", accent: true },
-  { label: "Battles Won", value: "72", sub: "of 124" },
-  { label: "Net P/L", value: "+$612", sub: "all-time", accent: true },
+  { label: "Slabs Held", value: "—", sub: "in your vault" },
+  { label: "Vault Value", value: "—", sub: "insured", accent: true },
+  { label: "Battles Won", value: "—", sub: "of 0" },
+  { label: "Net P/L", value: "—", sub: "all-time", accent: true },
 ]
 
-export const myCards: Card[] = [
-  { name: "Roronoa Zoro — Manga Rare", set: "OP06 #069", grade: "CGC 10", rarity: "LEGENDARY", value: 820 },
-  { name: "Boa Hancock — Full Art", set: "OP02 #088", grade: "PSA 9", rarity: "RARE", value: 525 },
-  { name: "Trafalgar Law — Parallel", set: "OP01 #047", grade: "CGC 10", rarity: "RARE", value: 410 },
-  { name: "Nami — Super Rare", set: "OP01 #016", grade: "PSA 9", rarity: "RARE", value: 290 },
-  { name: "Nico Robin — Holo", set: "OP04 #082", grade: "CGC 10", rarity: "COMMON", value: 210 },
-  { name: "Brook — Reverse Foil", set: "OP05 #061", grade: "PSA 8", rarity: "COMMON", value: 165 },
-]
+export const myCards: Card[] = []
 
-export const myBattles = [
-  { result: "WIN", you: "Roronoa Zoro", vs: "RedHair__", card: "Trafalgar Law", value: 410, ago: "12m ago" },
-  { result: "WIN", you: "Boa Hancock", vs: "SunnyGoes", card: "Nami — Super Rare", value: 290, ago: "2h ago" },
-  { result: "LOSS", you: "Tony Chopper", vs: "GrandLineX", card: "Tony Chopper", value: 190, ago: "5h ago" },
-  { result: "WIN", you: "Nico Robin", vs: "BluejamCo", card: "Usopp — Holo", value: 140, ago: "8h ago" },
-  { result: "LOSS", you: "Brook", vs: "KuroNeko", card: "Brook — Reverse", value: 165, ago: "1d ago" },
-]
+export const myBattles: { result: string; you: string; vs: string; card: string; value: number; ago: string }[] = []
 
-export const leaderboard = [
-  { rank: 1, handle: "RedHair__", title: "Yonko", wins: 188, value: 14200 },
-  { rank: 2, handle: "GomuKing", title: "Yonko", wins: 72, value: 3140, you: true },
-  { rank: 3, handle: "SunnyGoes", title: "Supernova", wins: 64, value: 2880 },
-  { rank: 4, handle: "GrandLineX", title: "Supernova", wins: 51, value: 2210 },
-  { rank: 5, handle: "BluejamCo", title: "Warlord", wins: 44, value: 1760 },
-  { rank: 6, handle: "KuroNeko", title: "Warlord", wins: 39, value: 1490 },
-]
+export const leaderboard: { rank: number; handle: string; title: string; wins: number; value: number; you?: boolean }[] = []

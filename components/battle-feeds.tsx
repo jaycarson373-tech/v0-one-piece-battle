@@ -1,13 +1,16 @@
-import { ArrowUpRight, Swords } from "lucide-react"
+import { ArrowUpRight, Swords, Inbox } from "lucide-react"
 import { battleFeed, arenaFeed } from "@/lib/data"
+import { EmptyState } from "@/components/empty-state"
 
 function FeedCard({
   title,
   cta,
+  empty,
   children,
 }: {
   title: string
   cta: string
+  empty: boolean
   children: React.ReactNode
 }) {
   return (
@@ -21,10 +24,16 @@ function FeedCard({
           {cta} →
         </a>
       </div>
-      <ul className="divide-y divide-border">{children}</ul>
-      <button className="mt-3 w-full rounded-lg border border-border py-2 text-xs font-semibold text-muted-foreground transition-colors hover:bg-secondary">
-        See more (10 more)
-      </button>
+      {empty ? (
+        <EmptyState
+          icon={Inbox}
+          title="No battles yet"
+          description="Results will appear here the moment the first battle is settled on-chain."
+          className="border-0 bg-transparent py-8"
+        />
+      ) : (
+        <ul className="divide-y divide-border">{children}</ul>
+      )}
     </div>
   )
 }
@@ -42,7 +51,7 @@ export function BattleFeeds() {
         </span>
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
-        <FeedCard title="1v1 Battles" cta="Play a 1v1">
+        <FeedCard title="1v1 Battles" cta="Play a 1v1" empty={battleFeed.length === 0}>
           {battleFeed.map((b, i) => (
             <li key={i} className="flex items-center justify-between gap-2 py-2.5 text-sm">
               <span className="flex min-w-0 items-center gap-2">
@@ -64,7 +73,7 @@ export function BattleFeeds() {
           ))}
         </FeedCard>
 
-        <FeedCard title="Slab Arena" cta="Enter the Arena">
+        <FeedCard title="Slab Arena" cta="Enter the Arena" empty={arenaFeed.length === 0}>
           {arenaFeed.map((a, i) => (
             <li key={i} className="flex items-center justify-between gap-2 py-2.5 text-sm">
               <span className="flex min-w-0 items-center gap-2">

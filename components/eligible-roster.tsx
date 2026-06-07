@@ -1,5 +1,6 @@
 import { Users } from "lucide-react"
 import { eligibleHolders } from "@/lib/arena"
+import { EmptyState } from "@/components/empty-state"
 
 export function EligibleRoster() {
   return (
@@ -16,31 +17,39 @@ export function EligibleRoster() {
         wallet is the pirate it fights with. More slabs held = more entries in the draw.
       </p>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-        {eligibleHolders.map((h) => (
-          <div key={h.handle} className="rounded-2xl border border-border bg-card p-4 text-center shadow-sm">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 font-heading text-base font-extrabold text-primary">
-              {h.character.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
+      {eligibleHolders.length === 0 ? (
+        <EmptyState
+          icon={Users}
+          title="No combatants yet"
+          description="Once wallets start holding One Piece slabs, the eligible roster for each snapshot will show up here."
+        />
+      ) : (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          {eligibleHolders.map((h) => (
+            <div key={h.handle} className="rounded-2xl border border-border bg-card p-4 text-center shadow-sm">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 font-heading text-base font-extrabold text-primary">
+                {h.character.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
+              </div>
+              <div className="mt-2 line-clamp-1 font-heading text-sm font-extrabold text-foreground">
+                {h.character.name}
+              </div>
+              <div className="line-clamp-1 text-[11px] text-muted-foreground">{h.character.epithet}</div>
+              <div className="mt-2 flex items-center justify-center gap-1 font-mono text-[10px] text-muted-foreground">
+                {h.wallet}
+              </div>
+              <div className="mt-2 flex items-center justify-center gap-2 border-t border-border pt-2 text-[11px]">
+                <span className="text-muted-foreground">
+                  PWR <span className="font-bold text-foreground">{h.character.power}</span>
+                </span>
+                <span className="text-border">·</span>
+                <span className="text-muted-foreground">
+                  <span className="font-bold text-foreground">{h.slabs}</span> slabs
+                </span>
+              </div>
             </div>
-            <div className="mt-2 line-clamp-1 font-heading text-sm font-extrabold text-foreground">
-              {h.character.name}
-            </div>
-            <div className="line-clamp-1 text-[11px] text-muted-foreground">{h.character.epithet}</div>
-            <div className="mt-2 flex items-center justify-center gap-1 font-mono text-[10px] text-muted-foreground">
-              {h.wallet}
-            </div>
-            <div className="mt-2 flex items-center justify-center gap-2 border-t border-border pt-2 text-[11px]">
-              <span className="text-muted-foreground">
-                PWR <span className="font-bold text-foreground">{h.character.power}</span>
-              </span>
-              <span className="text-border">·</span>
-              <span className="text-muted-foreground">
-                <span className="font-bold text-foreground">{h.slabs}</span> slabs
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </section>
   )
 }

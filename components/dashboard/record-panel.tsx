@@ -2,7 +2,7 @@ import { captain } from "@/lib/data"
 
 export function RecordPanel() {
   const total = captain.wins + captain.losses
-  const winPct = Math.round((captain.wins / total) * 100)
+  const winPct = total > 0 ? Math.round((captain.wins / total) * 100) : 0
 
   return (
     <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">

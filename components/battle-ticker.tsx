@@ -2,6 +2,7 @@ import { Swords } from "lucide-react"
 import { battleTicker } from "@/lib/data"
 
 export function BattleTicker() {
+  if (battleTicker.length === 0) return null
   const items = [...battleTicker, ...battleTicker]
   return (
     <div className="relative flex items-center overflow-hidden border-y-2 border-primary/40 bg-primary/10 py-2.5">
