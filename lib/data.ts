@@ -1,10 +1,10 @@
 export const navLinks = [
-  { label: "Battle", href: "#battles" },
-  { label: "Vault", href: "#vault" },
-  { label: "Earn", href: "#burn" },
-  { label: "Bounties", href: "#bounties" },
-  { label: "Transparency", href: "#numbers" },
-  { label: "How it works", href: "#how" },
+  { label: "Live Arena", href: "/arena" },
+  { label: "Vault", href: "/#vault" },
+  { label: "Earn", href: "/#burn" },
+  { label: "Bounties", href: "/#bounties" },
+  { label: "Transparency", href: "/#numbers" },
+  { label: "How it works", href: "/#how" },
   { label: "Profile", href: "#" },
 ]
 

@@ -1,5 +1,5 @@
 import { Skull } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { buttonVariants } from "@/components/ui/button"
 import { heroStats, heroSubStats, heroModes } from "@/lib/data"
 
 export function Hero() {
@@ -58,9 +58,12 @@ export function Hero() {
         </div>
 
         <div className="mt-7">
-          <Button size="lg" className="rounded-full px-8 text-base">
-            Enter the Battle →
-          </Button>
+          <a
+            href="/arena"
+            className={buttonVariants({ size: "lg", className: "rounded-full px-8 text-base" })}
+          >
+            Enter the Arena →
+          </a>
           <p className="mt-3 text-xs text-muted-foreground">$10 standard · avg $18 · $25 premium · avg $22</p>
         </div>
 

@@ -22,18 +22,18 @@ export function HourlyDraw() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-2">
       <a
-        href="#how"
+        href="/arena"
         className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-border bg-card p-5 shadow-sm transition-colors hover:border-primary sm:flex-row sm:items-center"
       >
         <div className="min-w-0">
           <div className="mb-1 text-xs font-bold uppercase tracking-widest text-primary">
-            Live · Free card every hour
+            Live · Battle every 15–60 min
           </div>
           <p className="text-pretty text-lg font-extrabold leading-snug text-foreground">
-            A graded slab. <span className="text-primary">Sent every hour.</span>
+            Two holders drawn. <span className="text-primary">Winner takes a grail.</span>
           </p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Last winner: Buggy&apos;s Alvida → 2d3x…SaME · $20
+            Last winner: GomuKing → 2d3x…SaME · $20
           </p>
         </div>
 
@@ -49,7 +49,7 @@ export function HourlyDraw() {
             ))}
           </div>
           <span className="inline-flex items-center gap-1 rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-foreground">
-            See how it works <ArrowRight className="h-4 w-4" />
+            Enter the Arena <ArrowRight className="h-4 w-4" />
           </span>
         </div>
       </a>
