@@ -8,7 +8,7 @@ export function Hero() {
       {/* One Piece faceoff battle backdrop */}
       <div className="pointer-events-none absolute inset-0 z-0">
         <img
-          src="/images/op-faceoff.webp"
+          src="/images/op-faceoff-spiral.jpeg"
           alt=""
           aria-hidden="true"
           className="h-full w-full object-cover object-center"
@@ -90,9 +90,9 @@ export function Hero() {
         <div className="relative">
           <div className="battle-glow relative overflow-hidden rounded-3xl border-2 border-gold/60 bg-card shadow-2xl shadow-black/40">
             <img
-              src="/images/op-luffy-punch.jpeg"
+              src="/images/op-luffy-pumped.jpeg"
               alt="One Piece characters clashing in battle"
-              className="h-64 w-full object-cover sm:h-80"
+              className="h-64 w-full object-cover object-top sm:h-80"
             />
             <div className="slash-lines absolute inset-0 opacity-40" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/50" />
