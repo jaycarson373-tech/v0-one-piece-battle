@@ -83,7 +83,7 @@ export function Hero() {
               How it works
             </a>
           </div>
-          <p className="mt-3 text-xs text-muted-foreground">No entry fee · Hold a slab, get drawn · Winner takes the prize</p>
+          <p className="mt-3 text-xs text-muted-foreground">No entry fee · Hold $Battle, get drawn · Winner takes the prize</p>
         </div>
 
         {/* right: VS battle graphic */}
