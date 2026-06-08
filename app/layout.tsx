@@ -20,9 +20,9 @@ const anton = Anton({
 })
 
 export const metadata: Metadata = {
-  title: 'One Piece Battle — Wager real graded character slabs in 1v1 duels.',
+  title: 'King of the Pirates — Live Solana pirate duel arena & treasury card vault.',
   description:
-    'Pay an entry to spin for a real graded One Piece TCG slab, or wager your own slab against another pirate. Winner takes the card — settled on-chain, instantly.',
+    'Enter $10 or $50 pirate duels, prove the randomness in the Proof Terminal, and watch treasury fees turn into real graded card airdrops for holders.',
   generator: 'v0.app',
   icons: {
     icon: [

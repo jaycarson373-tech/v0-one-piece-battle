@@ -7,7 +7,7 @@ export function SiteFooter() {
         <Logo />
         <nav className="flex items-center gap-5 text-sm font-medium text-muted-foreground" aria-label="Footer">
           <a href="#" className="hover:text-foreground">
-            @OnePiece_Battle
+            @KingOfThePirates
           </a>
           <a href="#" className="hover:text-foreground">
             Terms
@@ -16,9 +16,12 @@ export function SiteFooter() {
             Privacy
           </a>
         </nav>
-        <p className="max-w-md text-xs leading-relaxed text-muted-foreground">
-          18+ where legal. Not financial advice. Not affiliated with Eiichiro Oda, Shueisha, Toei Animation, or
-          Bandai. One Piece is a trademark of its respective owners.
+        <p className="max-w-2xl text-xs leading-relaxed text-muted-foreground">
+          King of the Pirates is an independent fan-made crypto game and card vault experience. It is not
+          affiliated with Eiichiro Oda, Shueisha, Toei Animation, Bandai, One Piece, or any official rights
+          holder. All card references are for collectible identification only. Eligibility, rewards, and game
+          mechanics are experimental and may be restricted by jurisdiction. Nothing on this website is
+          financial, legal, or professional advice.
         </p>
       </div>
     </footer>

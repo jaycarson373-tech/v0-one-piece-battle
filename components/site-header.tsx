@@ -12,7 +12,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <a href="#top" aria-label="One Piece Battle home">
+        <a href="#top" aria-label="King of the Pirates home">
           <Logo />
         </a>
 
@@ -24,7 +24,7 @@ export function SiteHeader() {
               className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               {link.label}
-              {link.label === "Live Arena" && (
+              {link.label === "Arena" && (
                 <span className="ml-1 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-primary align-middle" />
               )}
             </a>

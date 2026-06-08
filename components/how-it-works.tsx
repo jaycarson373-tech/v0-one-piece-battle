@@ -1,12 +1,12 @@
-import { Users, Swords, Trophy } from "lucide-react"
-import { howSteps, rarityTiers } from "@/lib/data"
+import { Swords, Dice5, Vault, Gift, ShieldCheck } from "lucide-react"
+import { kotpHowSteps } from "@/lib/kotp"
 
-const stepIcons = [Users, Swords, Trophy]
+const stepIcons = [Swords, Dice5, Vault, Gift, ShieldCheck]
 
 export function HowItWorks() {
   return (
     <section id="how" className="relative overflow-hidden border-t border-border">
-      {/* Showdown backdrop */}
+      {/* battle backdrop */}
       <div className="pointer-events-none absolute inset-0 z-0">
         <img
           src="/images/op-treasure-battle.jpeg"
@@ -19,31 +19,29 @@ export function HowItWorks() {
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 py-16">
         <div className="text-center">
-          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-gold">3 steps to treasure</span>
+          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-gold">Duel · Prove · Reward</span>
           <h2 className="mt-2 font-display text-4xl uppercase text-foreground text-shadow-poster sm:text-5xl">
             How it works
           </h2>
         </div>
 
         {/* step flow */}
-        <div className="relative mt-12 grid gap-6 md:grid-cols-3">
-          {/* connector line on desktop */}
-          <div
-            className="absolute left-0 right-0 top-9 hidden h-0.5 bg-gradient-to-r from-transparent via-gold/40 to-transparent md:block"
-            aria-hidden="true"
-          />
-          {howSteps.map((s, i) => {
+        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          {kotpHowSteps.map((s, i) => {
             const Icon = stepIcons[i]
             return (
-              <div key={s.step} className="relative flex flex-col items-center text-center">
-                <div className="relative z-10 flex h-16 w-16 items-center justify-center rounded-2xl border-2 border-gold bg-card p-4 shadow-xl shadow-black/30">
-                  <Icon className="h-8 w-8 text-gold" strokeWidth={2} />
-                  <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary font-mono text-xs font-bold text-primary-foreground">
-                    {i + 1}
-                  </span>
+              <div
+                key={s.step}
+                className="relative flex flex-col rounded-2xl border border-border bg-card/80 p-5 shadow-sm backdrop-blur"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-gold/50 bg-secondary">
+                    <Icon className="h-5 w-5 text-gold" strokeWidth={2} />
+                  </div>
+                  <span className="font-display text-2xl text-border">{s.step}</span>
                 </div>
-                <h3 className="mt-5 font-heading text-lg font-extrabold text-foreground">{s.title}</h3>
-                <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">{s.body}</p>
+                <h3 className="mt-4 font-heading text-base font-extrabold text-foreground">{s.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.body}</p>
               </div>
             )
           })}
@@ -51,36 +49,19 @@ export function HowItWorks() {
 
         <div className="mt-12 grid gap-4 lg:grid-cols-2">
           <div className="rounded-2xl border border-border bg-card/80 p-6 shadow-sm backdrop-blur">
-            <h3 className="font-heading text-lg font-extrabold text-foreground">What is One Piece Battle?</h3>
+            <h3 className="font-heading text-lg font-extrabold text-foreground">What is King of the Pirates?</h3>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              One Piece Battle is a Solana game where two random slab-holders are drawn each round and battle for
-              a prize. The treasury is publicly verifiable on-chain — every card you see above corresponds to a
-              real graded card mapped to its NFT.
+              King of the Pirates is a Solana-powered pirate duel arena where players enter $10 or $50 duels,
+              challenge another player, or accept open duels. Fees flow into a treasury that buys real graded
+              cards, and holders receive random treasury card airdrops every 30–60 minutes.
             </p>
           </div>
           <div className="rounded-2xl border border-gold/40 bg-foreground p-6 text-background shadow-sm">
             <h3 className="font-heading text-lg font-extrabold">Provably fair, every round</h3>
             <ul className="mt-3 space-y-2 text-sm leading-relaxed text-background/80">
-              <li>• Holders are drawn from a public on-chain snapshot — no hand-picking.</li>
-              <li>• The winner is chosen at random via Solana VRF and the prize is airdropped instantly.</li>
+              <li>• Every duel winner is decided by a verifiable randomness mechanism — no house edge.</li>
+              <li>• Each duel, card selection, and holder airdrop is logged to the public Proof Terminal.</li>
             </ul>
-          </div>
-        </div>
-
-        <div className="mt-10">
-          <h3 className="mb-3 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground">
-            Rarity tiers
-          </h3>
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            {rarityTiers.map((t) => (
-              <div key={t.tier} className="rounded-xl border border-border bg-card/80 p-4 shadow-sm backdrop-blur">
-                <div className="flex items-center gap-2">
-                  <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: t.color }} />
-                  <span className="font-heading text-sm font-extrabold text-foreground">{t.tier}</span>
-                </div>
-                <div className="mt-1.5 text-xs text-muted-foreground">{t.note}</div>
-              </div>
-            ))}
           </div>
         </div>
       </div>

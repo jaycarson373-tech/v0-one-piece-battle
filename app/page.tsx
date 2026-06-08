@@ -1,12 +1,11 @@
 import { SiteHeader } from "@/components/site-header"
 import { Hero } from "@/components/hero"
-import { BattleTicker } from "@/components/battle-ticker"
-import { BattleFeeds } from "@/components/battle-feeds"
-import { HourlyDraw } from "@/components/hourly-draw"
-import { Vault } from "@/components/vault"
+import { LiveDuelArena } from "@/components/live-duel-arena"
+import { ProofTerminal } from "@/components/proof-terminal"
+import { TreasuryVault } from "@/components/treasury-vault"
+import { HolderAirdrops } from "@/components/holder-airdrops"
 import { HowItWorks } from "@/components/how-it-works"
-import { DuelHowItWorks } from "@/components/duel-how-it-works"
-import { Faq } from "@/components/faq"
+import { DashboardPreview } from "@/components/dashboard-preview"
 import { SiteFooter } from "@/components/site-footer"
 
 export default function Page() {
@@ -15,13 +14,12 @@ export default function Page() {
       <SiteHeader />
       <main>
         <Hero />
-        <BattleTicker />
-        <BattleFeeds />
-        <HourlyDraw />
-        <Vault />
+        <LiveDuelArena />
+        <ProofTerminal />
+        <TreasuryVault />
+        <HolderAirdrops />
         <HowItWorks />
-        <DuelHowItWorks />
-        <Faq />
+        <DashboardPreview />
       </main>
       <SiteFooter />
     </div>
