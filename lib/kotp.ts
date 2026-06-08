@@ -115,12 +115,12 @@ export const proofRecords: ProofRecord[] = [
 // ---- Treasury Vault ----
 
 export const treasuryStats = [
-  { label: "Treasury Balance", value: "$48,210", accent: true },
-  { label: "Cards Purchased", value: "1,940" },
-  { label: "Cards Available", value: "612" },
-  { label: "Next Airdrop", value: "41:08", accent: true },
-  { label: "Total Airdropped", value: "$31,540" },
-  { label: "Last Winner", value: "Kp3x…Lz8Q" },
+  { label: "Treasury Balance", value: "—", accent: true },
+  { label: "Cards Purchased", value: "—" },
+  { label: "Cards Available", value: "—" },
+  { label: "Next Airdrop", value: "—", accent: true },
+  { label: "Total Airdropped", value: "—" },
+  { label: "Last Winner", value: "—" },
 ]
 
 export const treasurySplit = [
@@ -139,12 +139,12 @@ export const cardTiers = [
 // ---- Holder Airdrops ----
 
 export const airdropStats = [
-  { label: "Next Airdrop", value: "41:08", accent: true },
-  { label: "Eligible Holders", value: "1,284" },
-  { label: "Total Tickets", value: "9,640" },
-  { label: "Current Prize Pool", value: "$1,250", accent: true },
-  { label: "Last Winner", value: "Kp3x…Lz8Q" },
-  { label: "Last Card Pulled", value: "Zoro · Alt Art" },
+  { label: "Next Airdrop", value: "—", accent: true },
+  { label: "Eligible Holders", value: "—" },
+  { label: "Total Tickets", value: "—" },
+  { label: "Current Prize Pool", value: "—", accent: true },
+  { label: "Last Winner", value: "—" },
+  { label: "Last Card Pulled", value: "—" },
 ]
 
 export const airdropFlow = [
@@ -160,14 +160,14 @@ export const airdropFlow = [
 // ---- Dashboard Preview ----
 
 export const dashboardPreview = [
-  { label: "Active Duels", value: "23", accent: true },
-  { label: "Total Volume", value: "$184,920" },
-  { label: "Treasury Balance", value: "$48,210", accent: true },
-  { label: "Cards in Vault", value: "612" },
-  { label: "Next Holder Airdrop", value: "41:08" },
-  { label: "Fees Used for Cards", value: "$79,750" },
-  { label: "Latest Duel Winner", value: "Bv7Q…s1Re" },
-  { label: "Latest Airdrop Winner", value: "Kp3x…Lz8Q" },
+  { label: "Active Duels", value: "—", accent: true },
+  { label: "Total Volume", value: "—" },
+  { label: "Treasury Balance", value: "—", accent: true },
+  { label: "Cards in Vault", value: "—" },
+  { label: "Next Holder Airdrop", value: "—" },
+  { label: "Fees Used for Cards", value: "—" },
+  { label: "Latest Duel Winner", value: "—" },
+  { label: "Latest Airdrop Winner", value: "—" },
 ]
 
 export const kotpHowSteps = [
