@@ -5,7 +5,6 @@ import { CheckCircle2, Swords } from "lucide-react"
 import {
   CONNECTED_WALLET_KEY,
   DUEL_RESULTS_KEY,
-  OPEN_DUELS_KEY,
   type DuelResult,
   type DuelStake,
   type OpenDuel,
@@ -18,8 +17,13 @@ import {
   USDC_MINT,
   WALLET_EVENT,
 } from "@/lib/duel-store"
-import { payDuelEntryUsdc } from "@/lib/solana-usdc"
 import { resolveDuelWithSwitchboardVrf } from "@/lib/switchboard-vrf"
+
+type DuelListItem = OpenDuel & {
+  status: "open" | "resolving" | "settled"
+  playerB?: string
+  winnerWallet?: string
+}
 
 function useConnectedWallet() {
   const [wallet, setWallet] = useState("")
@@ -40,14 +44,9 @@ function useConnectedWallet() {
 
 export function DuelsClient() {
   const wallet = useConnectedWallet()
-  const [openDuels, setOpenDuels] = useState<OpenDuel[]>([])
+  const [duels, setDuels] = useState<DuelListItem[]>([])
   const [message, setMessage] = useState("")
-  const [pendingStake, setPendingStake] = useState<DuelStake | null>(null)
   const [resolvingDuelId, setResolvingDuelId] = useState("")
-
-  useEffect(() => {
-    setOpenDuels(readJsonArray<OpenDuel>(OPEN_DUELS_KEY))
-  }, [])
 
   async function startDuel(stake: DuelStake) {
     if (!wallet) {
@@ -55,37 +54,32 @@ export function DuelsClient() {
       return
     }
 
-    setPendingStake(stake)
-    setMessage(`DRY_RUN=true: requesting Phantom signature to simulate ${stake} USDC payment.`)
-
-    try {
-      const payment = await payDuelEntryUsdc(stake)
-
-      const nextDuel: OpenDuel = {
-        id: createEventId(),
-        eventId: createEventId(),
-        stake,
-        playerA: wallet,
-        createdAt: new Date().toISOString(),
-        dryRun: true,
-        token: "USDC",
-        mint: USDC_MINT,
-        treasuryWallet: TREASURY_WALLET,
-        paymentSignature: payment.signature,
-      }
-
-      const nextOpenDuels = [nextDuel, ...openDuels]
-      setOpenDuels(nextOpenDuels)
-      writeJsonArray(OPEN_DUELS_KEY, nextOpenDuels)
-      setMessage(`DRY_RUN=true: ${stake} USDC payment simulated. Duel opened. No funds moved.`)
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "USDC payment simulation failed.")
-    } finally {
-      setPendingStake(null)
+    const nextDuel: DuelListItem = {
+      id: createEventId(),
+      eventId: createEventId(),
+      stake,
+      playerA: wallet,
+      createdAt: new Date().toISOString(),
+      dryRun: true,
+      token: "USDC",
+      mint: USDC_MINT,
+      treasuryWallet: TREASURY_WALLET,
+      paymentSignature: "dry-run-in-memory",
+      status: "open",
     }
+
+    setDuels((items) => [nextDuel, ...items])
+    setMessage(`DRY_RUN=true: ${stake} USDC duel opened. No funds moved.`)
   }
 
-  async function acceptDuel(duel: OpenDuel) {
+  function cancelDuel(duel: DuelListItem) {
+    if (wallet !== duel.playerA || duel.status !== "open") return
+
+    setDuels((items) => items.filter((item) => item.id !== duel.id))
+    setMessage("Duel cancelled.")
+  }
+
+  async function acceptDuel(duel: DuelListItem) {
     if (!wallet) {
       setMessage("Connect Phantom in the nav before accepting a duel.")
       return
@@ -97,6 +91,7 @@ export function DuelsClient() {
     }
 
     setResolvingDuelId(duel.id)
+    setDuels((items) => items.map((item) => (item.id === duel.id ? { ...item, status: "resolving", playerB: wallet } : item)))
     setMessage("DRY_RUN=true: requesting Switchboard VRF dry-run resolution.")
 
     try {
@@ -127,13 +122,18 @@ export function DuelsClient() {
         status: "resolved",
       }
 
-      const nextOpenDuels = openDuels.filter((item) => item.id !== duel.id)
       const nextResults = [result, ...readJsonArray<DuelResult>(DUEL_RESULTS_KEY)].slice(0, 50)
-      setOpenDuels(nextOpenDuels)
-      writeJsonArray(OPEN_DUELS_KEY, nextOpenDuels)
+      setDuels((items) =>
+        items.map((item) =>
+          item.id === duel.id
+            ? { ...item, status: "settled", playerB: wallet, winnerWallet: resolution.winnerWallet }
+            : item,
+        ),
+      )
       writeJsonArray(DUEL_RESULTS_KEY, nextResults)
-      setMessage("DRY_RUN=true: duel resolved and proof posted. No funds moved.")
+      setMessage(resolution.winnerWallet === wallet ? "YOU WON 🏴‍☠️" : "YOU LOST")
     } catch (error) {
+      setDuels((items) => items.map((item) => (item.id === duel.id ? { ...item, status: "open", playerB: undefined } : item)))
       setMessage(error instanceof Error ? error.message : "Switchboard VRF dry-run resolution failed.")
     } finally {
       setResolvingDuelId("")
@@ -164,13 +164,12 @@ export function DuelsClient() {
             key={stake}
             type="button"
             onClick={() => startDuel(stake as DuelStake)}
-            disabled={pendingStake !== null}
             className="rounded-2xl border border-border bg-card p-6 text-left transition-colors hover:border-primary"
           >
             <span className="font-display text-3xl uppercase text-primary">Start ${stake} Duel</span>
             <span className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
               <CheckCircle2 className="h-4 w-4 text-gold" />
-              {pendingStake === stake ? "Waiting for Phantom" : `${stake} USDC dry-run payment`}
+              {stake} USDC dry-run payment
             </span>
           </button>
         ))}
@@ -187,25 +186,49 @@ export function DuelsClient() {
           <h2 className="font-heading text-lg font-extrabold text-foreground">Open duels waiting for an opponent</h2>
         </div>
         <div className="divide-y divide-border">
-          {openDuels.length === 0 ? (
+          {duels.length === 0 ? (
             <div className="p-5 text-sm text-muted-foreground">No open duels yet.</div>
           ) : (
-            openDuels.map((duel) => (
+            duels.map((duel) => (
               <div key={duel.id} className="grid gap-4 p-5 md:grid-cols-[1fr_auto] md:items-center">
                 <div className="grid gap-2 text-sm">
                   <div className="font-mono text-xs text-muted-foreground">{duel.eventId}</div>
                   <div className="font-heading text-xl font-extrabold text-foreground">{duel.stake} USDC</div>
                   <div className="text-muted-foreground">Player A: {shortWallet(duel.playerA)}</div>
+                  {duel.playerB && <div className="text-muted-foreground">Player B: {shortWallet(duel.playerB)}</div>}
+                  <div className="text-muted-foreground">Status: {duel.status}</div>
+                  {duel.winnerWallet && (
+                    <div className="text-muted-foreground">Winner: {shortWallet(duel.winnerWallet)}</div>
+                  )}
                   <div className="text-xs text-muted-foreground">Created {new Date(duel.createdAt).toLocaleString()}</div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => acceptDuel(duel)}
-                  disabled={resolvingDuelId === duel.id}
-                  className="rounded-full bg-primary px-5 py-2 text-sm font-bold text-primary-foreground"
-                >
-                  {resolvingDuelId === duel.id ? "Resolving" : "Accept Duel"}
-                </button>
+                {duel.status === "open" && wallet === duel.playerA && (
+                  <button
+                    type="button"
+                    onClick={() => cancelDuel(duel)}
+                    className="rounded-full bg-primary px-5 py-2 text-sm font-bold text-primary-foreground"
+                  >
+                    Cancel
+                  </button>
+                )}
+                {duel.status === "open" && wallet !== duel.playerA && (
+                  <button
+                    type="button"
+                    onClick={() => acceptDuel(duel)}
+                    className="rounded-full bg-primary px-5 py-2 text-sm font-bold text-primary-foreground"
+                  >
+                    Accept Duel
+                  </button>
+                )}
+                {duel.status === "resolving" && (
+                  <button
+                    type="button"
+                    disabled
+                    className="rounded-full bg-primary px-5 py-2 text-sm font-bold text-primary-foreground"
+                  >
+                    {resolvingDuelId === duel.id ? "Resolving" : "Resolving"}
+                  </button>
+                )}
               </div>
             ))
           )}
