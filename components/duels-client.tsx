@@ -13,10 +13,12 @@ import {
   makeCommitHash,
   readJsonArray,
   shortWallet,
+  TREASURY_WALLET,
   writeJsonArray,
   USDC_MINT,
   WALLET_EVENT,
 } from "@/lib/duel-store"
+import { payDuelEntryUsdc } from "@/lib/solana-usdc"
 
 function useConnectedWallet() {
   const [wallet, setWallet] = useState("")
@@ -39,32 +41,46 @@ export function DuelsClient() {
   const wallet = useConnectedWallet()
   const [openDuels, setOpenDuels] = useState<OpenDuel[]>([])
   const [message, setMessage] = useState("")
+  const [pendingStake, setPendingStake] = useState<DuelStake | null>(null)
 
   useEffect(() => {
     setOpenDuels(readJsonArray<OpenDuel>(OPEN_DUELS_KEY))
   }, [])
 
-  function startDuel(stake: DuelStake) {
+  async function startDuel(stake: DuelStake) {
     if (!wallet) {
       setMessage("Connect Phantom in the nav before starting a duel.")
       return
     }
 
-    const nextDuel: OpenDuel = {
-      id: createEventId(),
-      eventId: createEventId(),
-      stake,
-      playerA: wallet,
-      createdAt: new Date().toISOString(),
-      dryRun: true,
-      token: "USDC",
-      mint: USDC_MINT,
-    }
+    setPendingStake(stake)
+    setMessage(`DRY_RUN=true: requesting Phantom signature to simulate ${stake} USDC payment.`)
 
-    const nextOpenDuels = [nextDuel, ...openDuels]
-    setOpenDuels(nextOpenDuels)
-    writeJsonArray(OPEN_DUELS_KEY, nextOpenDuels)
-    setMessage(`DRY_RUN=true: ${stake} USDC duel opened. No funds moved.`)
+    try {
+      const payment = await payDuelEntryUsdc(stake)
+
+      const nextDuel: OpenDuel = {
+        id: createEventId(),
+        eventId: createEventId(),
+        stake,
+        playerA: wallet,
+        createdAt: new Date().toISOString(),
+        dryRun: true,
+        token: "USDC",
+        mint: USDC_MINT,
+        treasuryWallet: TREASURY_WALLET,
+        paymentSignature: payment.signature,
+      }
+
+      const nextOpenDuels = [nextDuel, ...openDuels]
+      setOpenDuels(nextOpenDuels)
+      writeJsonArray(OPEN_DUELS_KEY, nextOpenDuels)
+      setMessage(`DRY_RUN=true: ${stake} USDC payment simulated. Duel opened. No funds moved.`)
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "USDC payment simulation failed.")
+    } finally {
+      setPendingStake(null)
+    }
   }
 
   async function acceptDuel(duel: OpenDuel) {
@@ -124,12 +140,13 @@ export function DuelsClient() {
             key={stake}
             type="button"
             onClick={() => startDuel(stake as DuelStake)}
+            disabled={pendingStake !== null}
             className="rounded-2xl border border-border bg-card p-6 text-left transition-colors hover:border-primary"
           >
             <span className="font-display text-3xl uppercase text-primary">Start ${stake} Duel</span>
             <span className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
               <CheckCircle2 className="h-4 w-4 text-gold" />
-              {stake} USDC dry-run payment
+              {pendingStake === stake ? "Waiting for Phantom" : `${stake} USDC dry-run payment`}
             </span>
           </button>
         ))}
