@@ -22,7 +22,7 @@ const anton = Anton({
 export const metadata: Metadata = {
   title: 'King of the Pirates — Live Solana pirate duel arena & treasury card vault.',
   description:
-    'Enter $10 or $50 pirate duels, prove the randomness in the Proof Terminal, and watch treasury fees turn into real graded card airdrops for holders.',
+    'Enter $10 pirate duels, prove the randomness in the Proof Terminal, and watch treasury fees turn into real graded card airdrops for holders.',
   generator: 'v0.app',
   icons: {
     icon: [

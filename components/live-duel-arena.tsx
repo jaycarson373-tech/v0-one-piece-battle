@@ -43,7 +43,7 @@ export function LiveDuelArena() {
         </p>
 
         {/* duel tiers */}
-        <div className="mt-8 grid gap-4 md:grid-cols-3">
+        <div className="mt-8 grid gap-4 md:grid-cols-2">
           {duelTiers.map((t) => (
             <div
               key={t.name}

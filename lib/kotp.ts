@@ -5,7 +5,7 @@ export type DuelStatus = "open" | "live" | "settled"
 
 export type Duel = {
   id: string
-  stake: 10 | 50
+  stake: 10
   status: DuelStatus
   challenger: string
   opponent: string | null
@@ -15,11 +15,11 @@ export type Duel = {
 }
 
 export const liveDuels: Duel[] = [
-  { id: "DUEL-7F3A", stake: 50, status: "live", challenger: "9f2K…D4uM", opponent: "Bv7Q…s1Re", pool: 90, winner: null, ago: "now" },
+  { id: "DUEL-7F3A", stake: 10, status: "live", challenger: "9f2K…D4uM", opponent: "Bv7Q…s1Re", pool: 18, winner: null, ago: "now" },
   { id: "DUEL-91C2", stake: 10, status: "open", challenger: "3xKp…Lm0Z", opponent: null, pool: 18, winner: null, ago: "12s ago" },
-  { id: "DUEL-22B8", stake: 50, status: "open", challenger: "Az8t…Qh4N", opponent: null, pool: 90, winner: null, ago: "44s ago" },
+  { id: "DUEL-22B8", stake: 10, status: "open", challenger: "Az8t…Qh4N", opponent: null, pool: 18, winner: null, ago: "44s ago" },
   { id: "DUEL-08E1", stake: 10, status: "settled", challenger: "Td5w…Rk9P", opponent: "Mq2c…V7bL", pool: 18, winner: "Td5w…Rk9P", ago: "2m ago" },
-  { id: "DUEL-5C77", stake: 50, status: "settled", challenger: "Yh1n…Gc3X", opponent: "Wf6r…Up2D", pool: 90, winner: "Wf6r…Up2D", ago: "5m ago" },
+  { id: "DUEL-5C77", stake: 10, status: "settled", challenger: "Yh1n…Gc3X", opponent: "Wf6r…Up2D", pool: 18, winner: "Wf6r…Up2D", ago: "5m ago" },
 ]
 
 export const duelTiers = [
@@ -28,14 +28,6 @@ export const duelTiers = [
     name: "$10 Duel",
     tagline: "Fast entry. Quick battle. Winner takes the pot.",
     pool: 18,
-    accent: "ocean" as const,
-    soon: false,
-  },
-  {
-    stake: 50,
-    name: "$50 Duel",
-    tagline: "Higher stake. Higher tension. Same provably fair resolution.",
-    pool: 90,
     accent: "primary" as const,
     soon: false,
   },
@@ -51,7 +43,7 @@ export const duelTiers = [
 
 export const duelFlow = [
   "Connect Wallet",
-  "Select $10 or $50 Duel",
+  "Select a $10 Duel",
   "Create or Accept Challenge",
   "Randomness Resolves Battle",
   "Winner Paid / Proof Posted",
@@ -78,7 +70,7 @@ export const proofRecords: ProofRecord[] = [
     eventId: "EVT-0x9A41",
     type: "Duel",
     wallets: ["9f2K…D4uM", "Bv7Q…s1Re"],
-    wager: "$50",
+    wager: "$10",
     randomnessProof: "vrf:7c1f…a902",
     resultHash: "0x4d8e…11bc",
     winner: "Bv7Q…s1Re",
@@ -182,7 +174,7 @@ export const kotpHowSteps = [
   {
     step: "01",
     title: "Duel",
-    body: "Players enter $10 or $50 duels. One player creates the duel, another accepts, or later the house can accept.",
+    body: "Players enter $10 duels. One player creates the duel, another accepts, or later the house can accept.",
   },
   {
     step: "02",

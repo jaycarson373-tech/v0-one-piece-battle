@@ -51,7 +51,7 @@ export function HowItWorks() {
           <div className="rounded-2xl border border-border bg-card/80 p-6 shadow-sm backdrop-blur">
             <h3 className="font-heading text-lg font-extrabold text-foreground">What is King of the Pirates?</h3>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              King of the Pirates is a Solana-powered pirate duel arena where players enter $10 or $50 duels,
+              King of the Pirates is a Solana-powered pirate duel arena where players enter $10 duels,
               challenge another player, or accept open duels. Fees flow into a treasury that buys real graded
               cards, and holders receive random treasury card airdrops every 30–60 minutes.
             </p>
