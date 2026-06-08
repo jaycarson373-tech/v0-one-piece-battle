@@ -33,7 +33,7 @@ export function Vault() {
       {/* Straw Hat crew backdrop */}
       <div className="pointer-events-none absolute inset-0 z-0">
         <img
-          src="/images/op-crew-pose.jpeg"
+          src="/images/op-luffy-hat.jpeg"
           alt=""
           aria-hidden="true"
           className="h-full w-full object-cover object-top"

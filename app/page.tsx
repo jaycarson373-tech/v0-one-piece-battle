@@ -5,6 +5,7 @@ import { BattleFeeds } from "@/components/battle-feeds"
 import { HourlyDraw } from "@/components/hourly-draw"
 import { Vault } from "@/components/vault"
 import { HowItWorks } from "@/components/how-it-works"
+import { DuelHowItWorks } from "@/components/duel-how-it-works"
 import { Faq } from "@/components/faq"
 import { SiteFooter } from "@/components/site-footer"
 
@@ -19,6 +20,7 @@ export default function Page() {
         <HourlyDraw />
         <Vault />
         <HowItWorks />
+        <DuelHowItWorks />
         <Faq />
       </main>
       <SiteFooter />
