@@ -1,10 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { Menu, X, Wallet } from "lucide-react"
+import { Menu, X } from "lucide-react"
 import { Logo } from "./logo"
 import { navLinks } from "@/lib/data"
-import { Button } from "@/components/ui/button"
+import { WalletButton } from "@/components/wallet-button"
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false)
@@ -32,10 +32,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Button className="hidden gap-2 rounded-full sm:inline-flex">
-            <Wallet className="h-4 w-4" />
-            Connect Wallet
-          </Button>
+          <WalletButton className="hidden gap-2 rounded-full sm:inline-flex" />
           <button
             className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border lg:hidden"
             onClick={() => setOpen((v) => !v)}
@@ -62,10 +59,7 @@ export function SiteHeader() {
               </li>
             ))}
           </ul>
-          <Button className="mt-3 w-full gap-2 rounded-full sm:hidden">
-            <Wallet className="h-4 w-4" />
-            Connect Wallet
-          </Button>
+          <WalletButton className="mt-3 w-full gap-2 rounded-full sm:hidden" />
         </nav>
       )}
     </header>
