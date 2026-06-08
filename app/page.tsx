@@ -1,6 +1,5 @@
 import { SiteHeader } from "@/components/site-header"
 import { Hero } from "@/components/hero"
-import { LiveDuelArena } from "@/components/live-duel-arena"
 import { ProofTerminal } from "@/components/proof-terminal"
 import { TreasuryVault } from "@/components/treasury-vault"
 import { HolderAirdrops } from "@/components/holder-airdrops"
@@ -14,7 +13,6 @@ export default function Page() {
       <SiteHeader />
       <main>
         <Hero />
-        <LiveDuelArena />
         <ProofTerminal />
         <TreasuryVault />
         <HolderAirdrops />

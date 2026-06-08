@@ -1,5 +1,4 @@
 export const navLinks = [
-  { label: "Arena", href: "/#arena" },
   { label: "Duels", href: "/duels" },
   { label: "Vault", href: "/#vault" },
   { label: "Proof", href: "/proof" },
