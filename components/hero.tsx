@@ -1,11 +1,17 @@
-import { Swords } from "lucide-react"
+import { Swords, Eye, Terminal } from "lucide-react"
 import { buttonVariants } from "@/components/ui/button"
-import { heroModes } from "@/lib/data"
+
+const statusPills = [
+  { label: "Live Arena", live: true },
+  { label: "Proof of Random", live: false },
+  { label: "Treasury Active", live: false },
+  { label: "Holder Airdrops", live: false },
+]
 
 export function Hero() {
   return (
     <section id="top" className="relative overflow-hidden border-b border-border">
-      {/* One Piece faceoff battle backdrop */}
+      {/* pirate duel arena backdrop */}
       <div className="pointer-events-none absolute inset-0 z-0">
         <img
           src="/images/op-faceoff-spiral.jpeg"
@@ -13,12 +19,12 @@ export function Hero() {
           aria-hidden="true"
           className="h-full w-full object-cover object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/75 to-background" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/85 via-transparent to-background/85" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/80 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-transparent to-background/90" />
         <div className="slash-lines absolute inset-0 opacity-60" />
       </div>
 
-      <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-10 px-4 pb-14 pt-14 sm:pt-20 lg:grid-cols-[1.1fr_0.9fr]">
+      <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-14 sm:pt-20 lg:grid-cols-[1.1fr_0.9fr]">
         {/* left: copy */}
         <div className="text-center lg:text-left">
           <div className="mb-5 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs font-bold uppercase tracking-widest text-muted-foreground lg:justify-start">
@@ -26,88 +32,100 @@ export function Hero() {
               <span className="live-pulse inline-block h-2 w-2 rounded-full bg-primary" /> Live on Solana
             </span>
             <span className="text-border">/</span>
-            <span>Real Graded Slabs</span>
+            <span>Provably Fair</span>
             <span className="text-border">/</span>
-            <span>Settled in SOL</span>
+            <span>Real Card Airdrops</span>
           </div>
 
           <h1 className="text-balance font-display text-5xl uppercase leading-[0.92] text-foreground text-shadow-poster sm:text-7xl">
-            Two Pirates. <span className="text-primary">One Slab.</span> Winner Takes All.
+            Become <span className="text-primary">King</span> of the Pirates.
           </h1>
 
-          <p className="mx-auto mt-5 max-w-xl text-pretty leading-relaxed text-muted-foreground lg:mx-0">
-            Two random slab-holders are drawn from an on-chain snapshot and thrown into battle. One winner is
-            chosen at random — and they take the prize: a live pack opening or a real PSA/CGC-graded One Piece
-            slab. Settled in SOL, instantly and provably fair.
+          <p className="mx-auto mt-5 max-w-xl text-pretty font-heading text-lg font-bold text-foreground lg:mx-0">
+            Enter live pirate duels, prove the randomness, and watch the treasury turn fees into real card
+            airdrops.
           </p>
 
-          {/* mode pills */}
+          <p className="mx-auto mt-3 max-w-xl text-pretty leading-relaxed text-muted-foreground lg:mx-0">
+            Enter a $10 duel. Challenge another pirate, accept an open duel, or enter the house arena.
+            Every battle is resolved through a provably fair randomness system, logged publicly, and displayed
+            inside the Proof Terminal.
+          </p>
+
+          {/* status pills */}
           <div className="mt-7 flex flex-wrap items-center justify-center gap-2 lg:justify-start">
-            {heroModes.map((m, i) => {
-              const comingSoon = m.toLowerCase().includes("duel")
-              return (
+            {statusPills.map((p) => (
+              <span
+                key={p.label}
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-foreground backdrop-blur"
+              >
                 <span
-                  key={m}
-                  className={`relative inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-bold ${
-                    comingSoon
-                      ? "border-dashed border-gold/60 bg-card/40 text-muted-foreground backdrop-blur"
-                      : i === 0
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border bg-card/70 text-foreground backdrop-blur"
-                  }`}
-                >
-                  {m}
-                  {comingSoon && (
-                    <span className="rounded-full bg-gold px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-gold-foreground">
-                      Soon
-                    </span>
-                  )}
-                </span>
-              )
-            })}
+                  className={`inline-block h-2 w-2 rounded-full ${p.live ? "live-pulse bg-primary" : "bg-gold"}`}
+                />
+                {p.label}
+              </span>
+            ))}
           </div>
 
           <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row lg:items-start">
-            <a href="/arena" className={buttonVariants({ size: "lg", className: "strike-hover gap-2 rounded-full px-8 text-base" })}>
+            <a
+              href="#arena"
+              className={buttonVariants({ size: "lg", className: "strike-hover gap-2 rounded-full px-7 text-base" })}
+            >
               <Swords className="h-5 w-5" />
               Enter the Arena
             </a>
             <a
-              href="#how"
+              href="#duels"
               className={buttonVariants({
                 variant: "outline",
                 size: "lg",
-                className: "rounded-full border-gold bg-transparent px-8 text-base text-gold hover:bg-gold hover:text-gold-foreground",
+                className: "gap-2 rounded-full border-border bg-card/50 px-7 text-base text-foreground hover:bg-card",
               })}
             >
-              How it works
+              <Eye className="h-5 w-5" />
+              View Live Duels
+            </a>
+            <a
+              href="#proof"
+              className={buttonVariants({
+                variant: "outline",
+                size: "lg",
+                className:
+                  "gap-2 rounded-full border-gold bg-transparent px-7 text-base text-gold hover:bg-gold hover:text-gold-foreground",
+              })}
+            >
+              <Terminal className="h-5 w-5" />
+              Open Proof Terminal
             </a>
           </div>
-          <p className="mt-3 text-xs text-muted-foreground">No entry fee · Hold $Battle, get drawn · Winner takes the prize</p>
+          <p className="mt-3 text-xs text-muted-foreground">
+            $10 duels · Provably fair · Fees buy real cards for holder airdrops
+          </p>
         </div>
 
-        {/* right: VS battle graphic */}
+        {/* right: VS duel panel */}
         <div className="relative">
           <div className="battle-glow relative overflow-hidden rounded-3xl border-2 border-gold/60 bg-card shadow-2xl shadow-black/40">
             <img
               src="/images/op-luffy-pumped.jpeg"
-              alt="One Piece characters clashing in battle"
+              alt="Two pirates clashing in a duel arena"
               className="h-64 w-full object-cover object-top sm:h-80"
             />
             <div className="slash-lines absolute inset-0 opacity-40" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/50" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/55" />
 
             <div className="absolute inset-x-0 top-3 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-gold">
-              Demo · Sample matchup
+              Live Duel · $18 Pool
             </div>
 
-            {/* two randomly drawn holder wallets */}
+            {/* two duelers */}
             <div className="absolute left-3 top-1/2 -translate-y-1/2 rounded-xl border border-ocean/60 bg-background/85 px-3 py-2 backdrop-blur">
-              <div className="text-[9px] font-bold uppercase tracking-wider text-ocean">Holder A</div>
+              <div className="text-[9px] font-bold uppercase tracking-wider text-ocean">Challenger</div>
               <div className="font-mono text-sm font-bold text-foreground">9f2K…D4uM</div>
             </div>
             <div className="absolute right-3 top-1/2 -translate-y-1/2 rounded-xl border border-primary/60 bg-background/85 px-3 py-2 text-right backdrop-blur">
-              <div className="text-[9px] font-bold uppercase tracking-wider text-primary">Holder B</div>
+              <div className="text-[9px] font-bold uppercase tracking-wider text-primary">Opponent</div>
               <div className="font-mono text-sm font-bold text-foreground">Bv7Q…s1Re</div>
             </div>
 
@@ -117,16 +135,16 @@ export function Hero() {
             </div>
 
             <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between p-4">
-              <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gold">
-                <span className="inline-block h-2 w-2 rounded-full bg-gold" /> Example battle
+              <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary">
+                <span className="live-pulse inline-block h-2 w-2 rounded-full bg-primary" /> Resolving
               </div>
               <span className="rounded-full bg-background/80 px-2.5 py-1 font-mono text-xs font-bold text-foreground">
-                Prize · CGC 10
+                Winner takes $90
               </span>
             </div>
           </div>
           <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 rounded-full border border-gold bg-card px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-gold shadow-lg">
-            Next draw · 04:12
+            Next airdrop · 41:08
           </div>
         </div>
       </div>

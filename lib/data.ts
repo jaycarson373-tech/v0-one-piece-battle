@@ -1,8 +1,10 @@
 export const navLinks = [
-  { label: "Live Arena", href: "/arena" },
-  { label: "Duels", href: "/#duel" },
+  { label: "Arena", href: "/#arena" },
+  { label: "Duels", href: "/#duels" },
   { label: "Vault", href: "/#vault" },
-  { label: "How it works", href: "/#how" },
+  { label: "Proof", href: "/#proof" },
+  { label: "Airdrops", href: "/#airdrops" },
+  { label: "How It Works", href: "/#how" },
   { label: "Dashboard", href: "/dashboard" },
 ]
 
