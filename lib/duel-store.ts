@@ -4,6 +4,7 @@ export const TREASURY_WALLET =
 export const SOLANA_RPC_URL = process.env.NEXT_PUBLIC_SOLANA_RPC_URL ?? "https://api.devnet.solana.com"
 export const USDC_MINT = process.env.NEXT_PUBLIC_USDC_MINT ?? "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"
 export const USDC_DECIMALS = 6
+export const SWITCHBOARD_ON_DEMAND_PACKAGE = "@switchboard-xyz/on-demand"
 export const OPEN_DUELS_KEY = "kotp.openDuels"
 export const DUEL_RESULTS_KEY = "kotp.duelResults"
 export const CONNECTED_WALLET_KEY = "kotp.connectedWallet"
@@ -28,11 +29,16 @@ export type OpenDuel = {
 export type DuelResult = {
   eventId: string
   commitHash: string
+  resultHash: string
+  vrfProof: string
+  settlementTx: string
   playerA: string
   playerB: string
   winner: string
+  winnerWallet: string
   timestamp: string
   stake: DuelStake
+  status: "resolved"
 }
 
 export function shortWallet(wallet: string) {
@@ -72,7 +78,10 @@ export async function makeCommitHash(input: {
   winner: string
   timestamp: string
 }) {
-  const payload = `${input.eventId}:${input.playerA}:${input.playerB}:${input.winner}:${input.timestamp}`
+  return sha256Hex(`${input.eventId}:${input.playerA}:${input.playerB}:${input.winner}:${input.timestamp}`)
+}
+
+export async function sha256Hex(payload: string) {
   const bytes = new TextEncoder().encode(payload)
   const digest = await crypto.subtle.digest("SHA-256", bytes)
   return Array.from(new Uint8Array(digest))

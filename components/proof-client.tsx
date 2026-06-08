@@ -47,9 +47,12 @@ export function ProofClient() {
                 </div>
                 <div className="grid gap-2 md:grid-cols-2">
                   <TerminalRow label="Commit hash" value={result.commitHash} />
+                  <TerminalRow label="VRF proof" value={result.vrfProof} />
+                  <TerminalRow label="Result hash" value={result.resultHash} />
                   <TerminalRow label="Player A" value={shortWallet(result.playerA)} />
                   <TerminalRow label="Player B" value={shortWallet(result.playerB)} />
-                  <TerminalRow label="Winner" value={shortWallet(result.winner)} />
+                  <TerminalRow label="Winner" value={shortWallet(result.winnerWallet)} />
+                  <TerminalRow label="Settlement tx" value={result.settlementTx} />
                 </div>
               </div>
             ))
