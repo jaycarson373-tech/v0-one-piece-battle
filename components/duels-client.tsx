@@ -116,6 +116,7 @@ export function DuelsClient() {
         timestamp,
       }
       const result: DuelResult = {
+        type: "duel",
         ...resultBase,
         commitHash: await makeCommitHash(resultBase),
         resultHash: resolution.resultHash,
