@@ -1,5 +1,6 @@
 export const navLinks = [
   { label: "Live Arena", href: "/arena" },
+  { label: "Duels", href: "/#duel" },
   { label: "Vault", href: "/#vault" },
   { label: "How it works", href: "/#how" },
   { label: "Dashboard", href: "/dashboard" },
@@ -57,6 +58,33 @@ export const rarityTiers = [
   { tier: "LEGENDARY", note: "insured $5k–1k", color: "var(--primary)" },
   { tier: "RARE", note: "insured $300–1k", color: "var(--ocean)" },
   { tier: "COMMON", note: "insured <$300", color: "var(--muted-foreground)" },
+]
+
+// ---- Duel (player-vs-player slab wager) ----
+
+export const duelSteps = [
+  {
+    step: "01",
+    title: "Connect & pick your slab",
+    body: "Connect your Solana wallet and choose one graded slab from your vault to put on the line.",
+  },
+  {
+    step: "02",
+    title: "Set the wager & challenge",
+    body: "Match against an opponent of similar slab value, or open a challenge anyone can accept. Both slabs lock in escrow.",
+  },
+  {
+    step: "03",
+    title: "Battle & winner takes both",
+    body: "Your pirates clash in a live duel decided by Solana VRF. The winner walks away with both slabs, airdropped instantly.",
+  },
+]
+
+export const duelRules = [
+  "You wager your own slab — no treasury, no house. It's player vs player.",
+  "Both slabs are held in an on-chain escrow program until the duel resolves.",
+  "Wins and losses are 50/50, decided by verifiable Solana VRF — no edge for either side.",
+  "Lose and your slab goes to your opponent. Win and you double up. No partial losses.",
 ]
 
 // ---- Dashboard data ----
