@@ -7,9 +7,11 @@ export const USDC_DECIMALS = 6
 export const SWITCHBOARD_ON_DEMAND_PACKAGE = "@switchboard-xyz/on-demand"
 export const OPEN_DUELS_KEY = "kotp.openDuels"
 export const DUEL_RESULTS_KEY = "kotp.duelResults"
+export const AIRDROP_STATE_KEY = "kotp.airdropState"
 export const CONNECTED_WALLET_KEY = "kotp.connectedWallet"
 export const WALLET_EVENT = "kotp-wallet-change"
 export const DUEL_EVENT = "kotp-duel-change"
+export const AIRDROP_INTERVAL_MS = 60 * 60 * 1000
 
 export type DuelStake = 10 | 50
 
@@ -27,6 +29,7 @@ export type OpenDuel = {
 }
 
 export type DuelResult = {
+  type: "duel"
   eventId: string
   commitHash: string
   resultHash: string
@@ -40,6 +43,24 @@ export type DuelResult = {
   stake: DuelStake
   status: "resolved"
 }
+
+export type AirdropResult = {
+  type: "airdrop"
+  eventId: string
+  commitHash: string
+  resultHash: string
+  vrfProof: string
+  settlementTx: string
+  winnerWallet: string
+  timestamp: string
+  cardName: string
+  cardTier: string
+  holderTickets: number
+  totalTickets: number
+  status: "resolved"
+}
+
+export type ProofRecord = DuelResult | AirdropResult
 
 export function shortWallet(wallet: string) {
   if (wallet.length <= 10) return wallet

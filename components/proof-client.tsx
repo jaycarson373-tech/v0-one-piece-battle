@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react"
 import { Terminal } from "lucide-react"
-import { DUEL_EVENT, DUEL_RESULTS_KEY, type DuelResult, readJsonArray, shortWallet } from "@/lib/duel-store"
+import { DUEL_EVENT, DUEL_RESULTS_KEY, type ProofRecord, readJsonArray, shortWallet } from "@/lib/duel-store"
 
 export function ProofClient() {
-  const [results, setResults] = useState<DuelResult[]>([])
+  const [results, setResults] = useState<ProofRecord[]>([])
 
   useEffect(() => {
-    const syncResults = () => setResults(readJsonArray<DuelResult>(DUEL_RESULTS_KEY).slice(0, 10))
+    const syncResults = () => setResults(readJsonArray<ProofRecord>(DUEL_RESULTS_KEY).slice(0, 10))
     syncResults()
     window.addEventListener(DUEL_EVENT, syncResults)
     window.addEventListener("storage", syncResults)
@@ -43,15 +43,19 @@ export function ProofClient() {
               <div key={`${result.eventId}-${result.timestamp}`} className="grid gap-3 p-5 font-mono text-xs">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="font-bold text-gold">{result.eventId}</span>
-                  <span className="text-background/60">{new Date(result.timestamp).toLocaleString()}</span>
+                  <span className="text-background/60">
+                    {result.type === "airdrop" ? "Holder Airdrop" : "Duel"} -{" "}
+                    {new Date(result.timestamp).toLocaleString()}
+                  </span>
                 </div>
                 <div className="grid gap-2 md:grid-cols-2">
                   <TerminalRow label="Commit hash" value={result.commitHash} />
                   <TerminalRow label="VRF proof" value={result.vrfProof} />
                   <TerminalRow label="Result hash" value={result.resultHash} />
-                  <TerminalRow label="Player A" value={shortWallet(result.playerA)} />
-                  <TerminalRow label="Player B" value={shortWallet(result.playerB)} />
+                  {result.type === "duel" && <TerminalRow label="Player A" value={shortWallet(result.playerA)} />}
+                  {result.type === "duel" && <TerminalRow label="Player B" value={shortWallet(result.playerB)} />}
                   <TerminalRow label="Winner" value={shortWallet(result.winnerWallet)} />
+                  {result.type === "airdrop" && <TerminalRow label="Card" value={result.cardName} />}
                   <TerminalRow label="Settlement tx" value={result.settlementTx} />
                 </div>
               </div>
