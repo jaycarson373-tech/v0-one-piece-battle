@@ -2,5 +2,6 @@ allowBuilds:
   bigint-buffer: true
   bufferutil: true
   msw: true
+  protobufjs: true
   sharp: true
   utf-8-validate: true

@@ -19,6 +19,7 @@ import {
   WALLET_EVENT,
 } from "@/lib/duel-store"
 import { payDuelEntryUsdc } from "@/lib/solana-usdc"
+import { resolveDuelWithSwitchboardVrf } from "@/lib/switchboard-vrf"
 
 function useConnectedWallet() {
   const [wallet, setWallet] = useState("")
@@ -42,6 +43,7 @@ export function DuelsClient() {
   const [openDuels, setOpenDuels] = useState<OpenDuel[]>([])
   const [message, setMessage] = useState("")
   const [pendingStake, setPendingStake] = useState<DuelStake | null>(null)
+  const [resolvingDuelId, setResolvingDuelId] = useState("")
 
   useEffect(() => {
     setOpenDuels(readJsonArray<OpenDuel>(OPEN_DUELS_KEY))
@@ -94,26 +96,47 @@ export function DuelsClient() {
       return
     }
 
-    const timestamp = new Date().toISOString()
-    const resultBase = {
-      eventId: duel.eventId,
-      playerA: duel.playerA,
-      playerB: wallet,
-      winner: wallet,
-      timestamp,
-    }
-    const result: DuelResult = {
-      ...resultBase,
-      commitHash: await makeCommitHash(resultBase),
-      stake: duel.stake,
-    }
+    setResolvingDuelId(duel.id)
+    setMessage("DRY_RUN=true: requesting Switchboard VRF dry-run resolution.")
 
-    const nextOpenDuels = openDuels.filter((item) => item.id !== duel.id)
-    const nextResults = [result, ...readJsonArray<DuelResult>(DUEL_RESULTS_KEY)].slice(0, 50)
-    setOpenDuels(nextOpenDuels)
-    writeJsonArray(OPEN_DUELS_KEY, nextOpenDuels)
-    writeJsonArray(DUEL_RESULTS_KEY, nextResults)
-    setMessage("DRY_RUN=true: duel accepted and proof entry recorded. No funds moved.")
+    try {
+      const timestamp = new Date().toISOString()
+      const resolution = await resolveDuelWithSwitchboardVrf({
+        eventId: duel.eventId,
+        playerA: duel.playerA,
+        playerB: wallet,
+        stake: duel.stake,
+        timestamp,
+      })
+      const resultBase = {
+        eventId: duel.eventId,
+        playerA: duel.playerA,
+        playerB: wallet,
+        winner: resolution.winnerWallet,
+        timestamp,
+      }
+      const result: DuelResult = {
+        ...resultBase,
+        commitHash: await makeCommitHash(resultBase),
+        resultHash: resolution.resultHash,
+        vrfProof: resolution.vrfProof,
+        settlementTx: resolution.settlementTx,
+        winnerWallet: resolution.winnerWallet,
+        stake: duel.stake,
+        status: "resolved",
+      }
+
+      const nextOpenDuels = openDuels.filter((item) => item.id !== duel.id)
+      const nextResults = [result, ...readJsonArray<DuelResult>(DUEL_RESULTS_KEY)].slice(0, 50)
+      setOpenDuels(nextOpenDuels)
+      writeJsonArray(OPEN_DUELS_KEY, nextOpenDuels)
+      writeJsonArray(DUEL_RESULTS_KEY, nextResults)
+      setMessage("DRY_RUN=true: duel resolved and proof posted. No funds moved.")
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Switchboard VRF dry-run resolution failed.")
+    } finally {
+      setResolvingDuelId("")
+    }
   }
 
   return (
@@ -177,9 +200,10 @@ export function DuelsClient() {
                 <button
                   type="button"
                   onClick={() => acceptDuel(duel)}
+                  disabled={resolvingDuelId === duel.id}
                   className="rounded-full bg-primary px-5 py-2 text-sm font-bold text-primary-foreground"
                 >
-                  Accept Duel
+                  {resolvingDuelId === duel.id ? "Resolving" : "Accept Duel"}
                 </button>
               </div>
             ))
