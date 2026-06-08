@@ -139,7 +139,7 @@ export function Hero() {
                 <span className="live-pulse inline-block h-2 w-2 rounded-full bg-primary" /> Resolving
               </div>
               <span className="rounded-full bg-background/80 px-2.5 py-1 font-mono text-xs font-bold text-foreground">
-                $15–100+
+                Winner takes $18–100
               </span>
             </div>
           </div>
