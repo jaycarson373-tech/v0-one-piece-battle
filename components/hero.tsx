@@ -69,14 +69,14 @@ export function Hero() {
 
           <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row lg:items-start">
             <a
-              href="#arena"
+              href="/duels"
               className={buttonVariants({ size: "lg", className: "strike-hover gap-2 rounded-full px-7 text-base" })}
             >
               <Swords className="h-5 w-5" />
-              Enter the Arena
+              Enter the Duel Arena
             </a>
             <a
-              href="#duels"
+              href="/duels"
               className={buttonVariants({
                 variant: "outline",
                 size: "lg",
