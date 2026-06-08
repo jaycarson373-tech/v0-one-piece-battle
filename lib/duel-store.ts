@@ -1,5 +1,9 @@
-export const DRY_RUN = true
-export const USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+export const DRY_RUN = process.env.NEXT_PUBLIC_DRY_RUN !== "false"
+export const TREASURY_WALLET =
+  process.env.NEXT_PUBLIC_TREASURY_WALLET ?? "AuPgBoGhnqdmBE4LnjGoy4uUwRWmfRQDBVGDrbqQtux8"
+export const SOLANA_RPC_URL = process.env.NEXT_PUBLIC_SOLANA_RPC_URL ?? "https://api.devnet.solana.com"
+export const USDC_MINT = process.env.NEXT_PUBLIC_USDC_MINT ?? "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"
+export const USDC_DECIMALS = 6
 export const OPEN_DUELS_KEY = "kotp.openDuels"
 export const DUEL_RESULTS_KEY = "kotp.duelResults"
 export const CONNECTED_WALLET_KEY = "kotp.connectedWallet"
@@ -17,6 +21,8 @@ export type OpenDuel = {
   dryRun: true
   token: "USDC"
   mint: string
+  treasuryWallet: string
+  paymentSignature: string
 }
 
 export type DuelResult = {
