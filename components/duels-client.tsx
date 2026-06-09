@@ -27,7 +27,7 @@ import {
 import { subscribeWithBackoff } from "@/lib/supabase-realtime"
 import { resolveDuelWithSwitchboardVrf } from "@/lib/switchboard-vrf"
 import { payDuelEntryUsdc } from "@/lib/solana-usdc"
-import { assignAvailableSlab, settleDuelTreasuryReceipt } from "@/lib/vault-proof"
+import { assignAvailableSlab, sendSlabToWinner, settleDuelTreasuryReceipt } from "@/lib/vault-proof"
 
 type DuelListItem = OpenDuel & {
   status: "open" | "resolving" | "settled"
@@ -356,6 +356,22 @@ export function DuelsClient() {
         winnerWallet: resolution.winnerWallet,
         vrfProof: resolution.vrfProof,
         resultHash: resolution.resultHash,
+        sendSlab: async (sendInput) => {
+          console.log("Duel resolved; explicitly sending slab through /api/send-slab", {
+            eventId: sendInput.eventId,
+            slabId: sendInput.slabId,
+            winnerWallet: sendInput.winnerWallet,
+            nftMintAddress: sendInput.nftMintAddress,
+          })
+          const sendResult = await sendSlabToWinner(sendInput)
+          console.log("Duel slab /api/send-slab call completed", {
+            eventId: sendInput.eventId,
+            slabId: sendInput.slabId,
+            winnerWallet: sendInput.winnerWallet,
+            sendResult,
+          })
+          return sendResult
+        },
       })
 
       setDuels((items) => items.map((item) => (item.id === duel.id ? mapSupabaseDuel(resolvedDuel) : item)))

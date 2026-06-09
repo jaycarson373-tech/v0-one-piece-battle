@@ -17,6 +17,14 @@ type SendSlabRequest = {
 export async function POST(request: Request) {
   const input = (await request.json()) as SendSlabRequest
   const dryRun = process.env.DRY_RUN !== "false"
+  console.log("/api/send-slab request received", {
+    eventId: input.eventId,
+    slabId: input.slabId,
+    winnerWallet: input.winnerWallet,
+    nftMintAddress: input.nftMintAddress,
+    dryRun,
+  })
+
   const supabase = getServerSupabaseClient()
   const { data: card, error: cardError } = await supabase
     .from("vault_cards")
@@ -33,6 +41,13 @@ export async function POST(request: Request) {
 
   if (dryRun) {
     console.info("DRY_RUN=true: simulated treasury NFT slab transfer", { ...input, nftMintAddress })
+    console.log("/api/send-slab completed", {
+      eventId: input.eventId,
+      slabId: input.slabId,
+      winnerWallet: input.winnerWallet,
+      status: "reserved",
+      dryRun: true,
+    })
     return NextResponse.json({
       dryRun: true,
       signature: `dry-run-nft-${input.slabId}`,
@@ -100,6 +115,15 @@ export async function POST(request: Request) {
         error: updateError.message,
       })
     }
+
+    console.log("/api/send-slab completed", {
+      eventId: input.eventId,
+      slabId: input.slabId,
+      winnerWallet: input.winnerWallet,
+      status: "airdropped",
+      dryRun: false,
+      signature,
+    })
 
     return NextResponse.json({ dryRun: false, signature, sent: true, status: "airdropped" })
   } catch (error) {
