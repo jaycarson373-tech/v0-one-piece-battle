@@ -6,12 +6,20 @@ export type SlabAssignmentResult = {
   slab: VaultCardRow | null
 }
 
+export type SendSlabToWinnerInput = {
+  slabId: string
+  winnerWallet: string
+  eventId: string
+  nftMintAddress: string | null
+}
+
 type AssignSlabInput = {
   eventId: string
   eventType: "duel_slab_assignment" | "holder_airdrop"
   winnerWallet: string
   vrfProof: string
   resultHash: string
+  sendSlab?: (input: SendSlabToWinnerInput) => Promise<unknown>
 }
 
 export async function assignAvailableSlab(input: AssignSlabInput): Promise<SlabAssignmentResult> {
@@ -90,7 +98,8 @@ export async function assignAvailableSlab(input: AssignSlabInput): Promise<SlabA
         status: reservedCard.status,
       })
 
-      const sendResult = await sendSlabToWinner({
+      const sendSlab = input.sendSlab ?? sendSlabToWinner
+      const sendResult = await sendSlab({
         slabId: reservedCard.id,
         winnerWallet: input.winnerWallet,
         eventId: input.eventId,
@@ -184,16 +193,25 @@ async function orderCardsByVrf(cards: VaultCardRow[], input: AssignSlabInput) {
   return [...cards.slice(startIndex), ...cards.slice(0, startIndex)]
 }
 
-async function sendSlabToWinner(input: {
-  slabId: string
-  winnerWallet: string
-  eventId: string
-  nftMintAddress: string | null
-}) {
+export async function sendSlabToWinner(input: SendSlabToWinnerInput) {
+  console.log("Calling /api/send-slab", {
+    eventId: input.eventId,
+    slabId: input.slabId,
+    winnerWallet: input.winnerWallet,
+    nftMintAddress: input.nftMintAddress,
+  })
+
   const response = await fetch("/api/send-slab", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
+  })
+
+  console.log("/api/send-slab response received", {
+    eventId: input.eventId,
+    slabId: input.slabId,
+    status: response.status,
+    ok: response.ok,
   })
 
   if (!response.ok) {
