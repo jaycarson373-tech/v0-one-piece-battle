@@ -20,6 +20,7 @@ function getPhantom(): PhantomProvider | null {
 export function WalletButton({ className }: { className?: string }) {
   const [wallet, setWallet] = useState("")
   const [status, setStatus] = useState("")
+  const [open, setOpen] = useState(false)
 
   useEffect(() => {
     const stored = window.localStorage.getItem(CONNECTED_WALLET_KEY)
@@ -27,6 +28,11 @@ export function WalletButton({ className }: { className?: string }) {
   }, [])
 
   async function connectWallet() {
+    if (wallet) {
+      setOpen((value) => !value)
+      return
+    }
+
     const phantom = getPhantom()
 
     if (!phantom) {
@@ -46,10 +52,31 @@ export function WalletButton({ className }: { className?: string }) {
     }
   }
 
+  function disconnectWallet() {
+    window.localStorage.removeItem(CONNECTED_WALLET_KEY)
+    window.dispatchEvent(new Event(WALLET_EVENT))
+    setWallet("")
+    setStatus("")
+    setOpen(false)
+  }
+
   return (
-    <Button type="button" className={className} onClick={connectWallet}>
-      <Wallet className="h-4 w-4" />
-      {wallet ? shortWallet(wallet) : status || "Connect Wallet"}
-    </Button>
+    <div className="relative">
+      <Button type="button" className={className} onClick={connectWallet}>
+        <Wallet className="h-4 w-4" />
+        {wallet ? shortWallet(wallet) : status || "Connect Wallet"}
+      </Button>
+      {wallet && open && (
+        <div className="absolute right-0 top-full z-50 mt-2 min-w-40 rounded-xl border border-border bg-card p-2 shadow-lg">
+          <button
+            type="button"
+            onClick={disconnectWallet}
+            className="w-full rounded-lg px-3 py-2 text-left text-sm font-bold text-muted-foreground hover:bg-secondary hover:text-foreground"
+          >
+            Disconnect
+          </button>
+        </div>
+      )}
+    </div>
   )
 }

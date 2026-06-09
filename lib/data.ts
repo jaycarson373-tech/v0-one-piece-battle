@@ -55,10 +55,11 @@ export const howSteps = [
 ]
 
 export const rarityTiers = [
-  { tier: "MYTHIC", note: "insured $1k+", color: "var(--gold)" },
-  { tier: "LEGENDARY", note: "insured $5k–1k", color: "var(--primary)" },
-  { tier: "RARE", note: "insured $300–1k", color: "var(--ocean)" },
-  { tier: "COMMON", note: "insured <$300", color: "var(--muted-foreground)" },
+  { tier: "COMMON", note: "under $25", color: "var(--muted-foreground)" },
+  { tier: "RARE", note: "$25–$35", color: "var(--ocean)" },
+  { tier: "EPIC", note: "$35–$50", color: "var(--gold)" },
+  { tier: "LEGENDARY", note: "$50–$100", color: "var(--primary)" },
+  { tier: "MYTHIC", note: "$100+", color: "var(--foreground)" },
 ]
 
 // ---- Duel (player-vs-player slab wager) ----
@@ -82,7 +83,7 @@ export const duelSteps = [
 ]
 
 export const duelRules = [
-  "You wager your own slab — no treasury, no house. It's player vs player.",
+  "You wager your own slab. It's player vs player.",
   "Both slabs are held in an on-chain escrow program until the duel resolves.",
   "Wins and losses are 50/50, decided by verifiable Solana VRF — no edge for either side.",
   "Lose and your slab goes to your opponent. Win and you double up. No partial losses.",

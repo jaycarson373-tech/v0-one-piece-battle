@@ -6,8 +6,8 @@ export function SiteFooter() {
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-4 py-10 text-center">
         <Logo />
         <nav className="flex items-center gap-5 text-sm font-medium text-muted-foreground" aria-label="Footer">
-          <a href="#" className="hover:text-foreground">
-            @KingOfThePirates
+          <a href="https://x.com/KOTPirates_" target="_blank" rel="noreferrer" className="hover:text-foreground">
+            @KOTPirates_
           </a>
           <a href="#" className="hover:text-foreground">
             Terms
