@@ -87,7 +87,7 @@ export function Hero() {
               View Live Duels
             </a>
             <a
-              href="#proof"
+              href="/proof"
               className={buttonVariants({
                 variant: "outline",
                 size: "lg",

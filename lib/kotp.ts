@@ -65,52 +65,7 @@ export type ProofRecord = {
   status: "Settled" | "Pending" | "Resolving"
 }
 
-export const proofRecords: ProofRecord[] = [
-  {
-    eventId: "EVT-0x9A41",
-    type: "Duel",
-    wallets: ["9f2K…D4uM", "Bv7Q…s1Re"],
-    wager: "$10",
-    randomnessProof: "vrf:7c1f…a902",
-    resultHash: "0x4d8e…11bc",
-    winner: "Bv7Q…s1Re",
-    settlementTx: "5Ht9…Qz2m",
-    status: "Settled",
-  },
-  {
-    eventId: "EVT-0x9A40",
-    type: "Holder Airdrop",
-    wallets: ["snapshot · 1,284 holders"],
-    wager: "—",
-    randomnessProof: "vrf:2b6d…ff31",
-    resultHash: "0x77a2…90de",
-    winner: "Kp3x…Lz8Q",
-    settlementTx: "8Jd2…Rk1p",
-    status: "Settled",
-  },
-  {
-    eventId: "EVT-0x9A3F",
-    type: "Card Selection",
-    wallets: ["vault pool · 612 cards"],
-    wager: "—",
-    randomnessProof: "vrf:9e0a…c7b4",
-    resultHash: "0x12fb…44a1",
-    winner: "Zoro · Alt Art (EPIC)",
-    settlementTx: "2Gh7…Tn5w",
-    status: "Settled",
-  },
-  {
-    eventId: "EVT-0x9A3E",
-    type: "Duel",
-    wallets: ["3xKp…Lm0Z", "Mq2c…V7bL"],
-    wager: "$10",
-    randomnessProof: "vrf:committed",
-    resultHash: "pending",
-    winner: "—",
-    settlementTx: "—",
-    status: "Resolving",
-  },
-]
+export const proofRecords: ProofRecord[] = []
 
 // ---- Treasury Vault ----
 
@@ -197,3 +152,4 @@ export const kotpHowSteps = [
     body: "Every duel, winner, card selection, and airdrop is logged with hashes, transactions, and verification data.",
   },
 ]
+

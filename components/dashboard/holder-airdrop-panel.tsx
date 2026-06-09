@@ -74,7 +74,7 @@ export function HolderAirdropPanel() {
         disabled={running}
         className="mt-5 w-full rounded-full bg-primary px-5 py-2 text-sm font-bold text-primary-foreground transition-colors hover:opacity-90 disabled:opacity-60"
       >
-        {running ? "Running Airdrop" : "Run Airdrop Now"}
+        {running ? "Running Airdrop" : "Run Holder Airdrop Now"}
       </button>
     </div>
   )

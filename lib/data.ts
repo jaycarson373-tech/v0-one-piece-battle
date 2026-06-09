@@ -1,6 +1,6 @@
 export const navLinks = [
   { label: "Duels", href: "/duels" },
-  { label: "Vault", href: "/#vault" },
+  { label: "Vault", href: "/vault" },
   { label: "Proof", href: "/proof" },
   { label: "Airdrops", href: "/#airdrops" },
   { label: "How It Works", href: "/#how" },
