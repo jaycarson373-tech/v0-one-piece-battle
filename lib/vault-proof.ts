@@ -63,11 +63,34 @@ export async function assignAvailableSlab(input: AssignSlabInput): Promise<SlabA
       .select()
       .maybeSingle()
 
-    if (reserveError) throw reserveError
-    if (!reservedCard) continue
+    if (reserveError) {
+      console.error("Failed to reserve winner slab in Supabase", {
+        eventId: input.eventId,
+        slabId: selectedCard.id,
+        winnerWallet: input.winnerWallet,
+        error: reserveError,
+      })
+      throw reserveError
+    }
+
+    if (!reservedCard) {
+      console.warn("Available slab was claimed before this duel could reserve it", {
+        eventId: input.eventId,
+        slabId: selectedCard.id,
+        winnerWallet: input.winnerWallet,
+      })
+      continue
+    }
 
     try {
-      await sendSlabToWinner({
+      console.info("Winner slab reserved in Supabase", {
+        eventId: input.eventId,
+        slabId: reservedCard.id,
+        winnerWallet: input.winnerWallet,
+        status: reservedCard.status,
+      })
+
+      const sendResult = await sendSlabToWinner({
         slabId: reservedCard.id,
         winnerWallet: input.winnerWallet,
         eventId: input.eventId,
@@ -84,6 +107,7 @@ export async function assignAvailableSlab(input: AssignSlabInput): Promise<SlabA
         status: "settled",
       })
 
+      console.info("Slab assigned to duel winner", { slab: reservedCard, proof, sendResult })
       return { proof, slab: reservedCard }
     } catch (error) {
       console.error("Treasury NFT send failed; releasing slab and trying next available card", {
@@ -177,5 +201,9 @@ async function sendSlabToWinner(input: {
     throw new Error(payload?.error ?? "Treasury NFT slab transfer failed.")
   }
 
-  return response.json()
+  const payload = await response.json()
+  if (payload?.error) {
+    console.error("Treasury NFT slab transfer completed with a follow-up error", payload)
+  }
+  return payload
 }

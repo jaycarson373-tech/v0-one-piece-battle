@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { createClient } from "@supabase/supabase-js"
 import { Connection, Keypair, PublicKey, Transaction } from "@solana/web3.js"
 import {
   createAssociatedTokenAccountInstruction,
@@ -16,23 +17,37 @@ type SendSlabRequest = {
 export async function POST(request: Request) {
   const input = (await request.json()) as SendSlabRequest
   const dryRun = process.env.DRY_RUN !== "false"
+  const supabase = getServerSupabaseClient()
+  const { data: card, error: cardError } = await supabase
+    .from("vault_cards")
+    .select("id,nft_mint_address")
+    .eq("id", input.slabId)
+    .single()
+
+  if (cardError || !card) {
+    console.error("Treasury NFT slab lookup failed", { slabId: input.slabId, error: cardError })
+    return NextResponse.json({ error: "Vault card was not found for NFT transfer." }, { status: 404 })
+  }
+
+  const nftMintAddress = card.nft_mint_address ?? input.nftMintAddress
 
   if (dryRun) {
-    console.info("DRY_RUN=true: simulated treasury NFT slab transfer", input)
+    console.info("DRY_RUN=true: simulated treasury NFT slab transfer", { ...input, nftMintAddress })
     return NextResponse.json({
       dryRun: true,
       signature: `dry-run-nft-${input.slabId}`,
+      status: "reserved",
     })
   }
 
-  if (!input.nftMintAddress) {
+  if (!nftMintAddress) {
     return NextResponse.json({ error: "Vault card is missing nft_mint_address." }, { status: 400 })
   }
 
   try {
     const treasury = readTreasuryKeypair()
     const connection = new Connection(process.env.NEXT_PUBLIC_SOLANA_RPC_URL ?? "https://api.devnet.solana.com", "confirmed")
-    const mint = new PublicKey(input.nftMintAddress)
+    const mint = new PublicKey(nftMintAddress)
     const winner = new PublicKey(input.winnerWallet)
     const sourceAta = getAssociatedTokenAddressSync(mint, treasury.publicKey)
     const destinationAta = getAssociatedTokenAddressSync(mint, winner)
@@ -57,11 +72,36 @@ export async function POST(request: Request) {
       eventId: input.eventId,
       slabId: input.slabId,
       winnerWallet: input.winnerWallet,
-      nftMintAddress: input.nftMintAddress,
+      nftMintAddress,
       signature,
     })
 
-    return NextResponse.json({ dryRun: false, signature })
+    const { error: updateError } = await supabase
+      .from("vault_cards")
+      .update({
+        status: "airdropped",
+        assigned_to: input.winnerWallet,
+        assigned_at: new Date().toISOString(),
+      })
+      .eq("id", input.slabId)
+
+    if (updateError) {
+      console.error("NFT sent but failed to mark slab airdropped in Supabase", {
+        slabId: input.slabId,
+        winnerWallet: input.winnerWallet,
+        signature,
+        error: updateError,
+      })
+      return NextResponse.json({
+        dryRun: false,
+        signature,
+        sent: true,
+        status: "sent_update_failed",
+        error: updateError.message,
+      })
+    }
+
+    return NextResponse.json({ dryRun: false, signature, sent: true, status: "airdropped" })
   } catch (error) {
     console.error("Treasury NFT slab transfer failed", error)
     return NextResponse.json(
@@ -77,4 +117,19 @@ function readTreasuryKeypair() {
 
   const secret = JSON.parse(raw) as number[]
   return Keypair.fromSecretKey(Uint8Array.from(secret))
+}
+
+function getServerSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error("Supabase env vars are missing for slab transfer.")
+  }
+
+  return createClient(supabaseUrl, supabaseKey, {
+    auth: {
+      persistSession: false,
+    },
+  })
 }
