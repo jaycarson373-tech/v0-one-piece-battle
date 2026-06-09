@@ -4,26 +4,28 @@ import { useEffect, useState } from "react"
 import { CheckCircle2, Swords } from "lucide-react"
 import {
   CONNECTED_WALLET_KEY,
-  DUEL_RESULTS_KEY,
-  type DuelResult,
   type DuelStake,
   type OpenDuel,
   createEventId,
-  makeCommitHash,
-  readJsonArray,
   shortWallet,
   TREASURY_WALLET,
-  writeJsonArray,
   USDC_MINT,
   WALLET_EVENT,
 } from "@/lib/duel-store"
 import {
   DUELS_REALTIME_CHANNEL,
   DUELS_REALTIME_FILTER,
+  PROOF_LOG_REALTIME_CHANNEL,
+  PROOF_LOG_REALTIME_FILTER,
+  VAULT_CARDS_REALTIME_CHANNEL,
+  VAULT_CARDS_REALTIME_FILTER,
   getSupabaseDuelsClient,
+  type ProofLogRow,
   type SupabaseDuelRow,
+  type VaultCardRow,
 } from "@/lib/supabase-duels"
 import { resolveDuelWithSwitchboardVrf } from "@/lib/switchboard-vrf"
+import { assignAvailableSlab, settleDuelTreasuryReceipt } from "@/lib/vault-proof"
 
 type DuelListItem = OpenDuel & {
   status: "open" | "resolving" | "settled"
@@ -73,8 +75,12 @@ function sortDuels(items: DuelListItem[]) {
 export function DuelsClient() {
   const wallet = useConnectedWallet()
   const [duels, setDuels] = useState<DuelListItem[]>([])
+  const [proofLog, setProofLog] = useState<ProofLogRow[]>([])
+  const [vaultCards, setVaultCards] = useState<VaultCardRow[]>([])
   const [message, setMessage] = useState("")
   const [resolvingDuelId, setResolvingDuelId] = useState("")
+  const activeDuels = duels.filter((duel) => duel.status !== "settled")
+  const settledDuels = duels.filter((duel) => duel.status === "settled")
 
   useEffect(() => {
     const supabase = getSupabaseDuelsClient()
@@ -121,6 +127,72 @@ export function DuelsClient() {
 
     return () => {
       void supabase.removeChannel(channel)
+    }
+  }, [])
+
+  useEffect(() => {
+    const supabase = getSupabaseDuelsClient()
+
+    if (!supabase) return
+
+    async function loadHistoryData() {
+      const [proofResponse, cardsResponse] = await Promise.all([
+        supabase.from("proof_log").select("*").order("timestamp", { ascending: false }),
+        supabase.from("vault_cards").select("*").order("created_at", { ascending: false }),
+      ])
+
+      if (proofResponse.error) {
+        setMessage(proofResponse.error.message)
+      } else {
+        setProofLog(proofResponse.data ?? [])
+      }
+
+      if (cardsResponse.error) {
+        setMessage(cardsResponse.error.message)
+      } else {
+        setVaultCards(cardsResponse.data ?? [])
+      }
+    }
+
+    const proofChannel = supabase
+      .channel(`${PROOF_LOG_REALTIME_CHANNEL}:duels-history`)
+      .on("postgres_changes", PROOF_LOG_REALTIME_FILTER, (payload) => {
+        if (payload.eventType === "DELETE") {
+          const deleted = payload.old as Partial<ProofLogRow>
+          setProofLog((items) => items.filter((item) => item.event_id !== deleted.event_id))
+          return
+        }
+
+        const nextProof = payload.new as ProofLogRow
+        setProofLog((items) => {
+          const existing = items.filter((item) => item.event_id !== nextProof.event_id)
+          return [nextProof, ...existing].sort((a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp))
+        })
+      })
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") void loadHistoryData()
+      })
+
+    const vaultChannel = supabase
+      .channel(`${VAULT_CARDS_REALTIME_CHANNEL}:duels-history`)
+      .on("postgres_changes", VAULT_CARDS_REALTIME_FILTER, (payload) => {
+        if (payload.eventType === "DELETE") {
+          const deleted = payload.old as Partial<VaultCardRow>
+          setVaultCards((items) => items.filter((item) => item.id !== deleted.id))
+          return
+        }
+
+        const nextCard = payload.new as VaultCardRow
+        setVaultCards((items) => {
+          const existing = items.filter((item) => item.id !== nextCard.id)
+          return [nextCard, ...existing]
+        })
+      })
+      .subscribe()
+
+    return () => {
+      void supabase.removeChannel(proofChannel)
+      void supabase.removeChannel(vaultChannel)
     }
   }, [])
 
@@ -216,26 +288,19 @@ export function DuelsClient() {
         stake: duel.stake,
         timestamp,
       })
-      const resultBase = {
+      await settleDuelTreasuryReceipt({
         eventId: duel.eventId,
         playerA: duel.playerA,
         playerB: wallet,
-        winner: resolution.winnerWallet,
-        timestamp,
-      }
-      const result: DuelResult = {
-        type: "duel",
-        ...resultBase,
-        commitHash: await makeCommitHash(resultBase),
-        resultHash: resolution.resultHash,
-        vrfProof: resolution.vrfProof,
-        settlementTx: resolution.settlementTx,
+      })
+      const slabAssignment = await assignAvailableSlab({
+        eventId: duel.eventId,
+        eventType: "duel_slab_assignment",
         winnerWallet: resolution.winnerWallet,
-        stake: duel.stake,
-        status: "resolved",
-      }
+        vrfProof: resolution.vrfProof,
+        resultHash: resolution.resultHash,
+      })
 
-      const nextResults = [result, ...readJsonArray<DuelResult>(DUEL_RESULTS_KEY)].slice(0, 50)
       const { data: resolvedDuel, error: resolvedError } = await supabase
         .from("duels")
         .update({
@@ -252,8 +317,11 @@ export function DuelsClient() {
       if (resolvedError) throw resolvedError
 
       setDuels((items) => items.map((item) => (item.id === duel.id ? mapSupabaseDuel(resolvedDuel) : item)))
-      writeJsonArray(DUEL_RESULTS_KEY, nextResults)
-      setMessage(resolution.winnerWallet === wallet ? "YOU WON 🏴‍☠️" : "YOU LOST")
+      setMessage(
+        resolution.winnerWallet === wallet
+          ? `YOU WON 🏴‍☠️${slabAssignment.slab ? ` - slab reserved: ${slabAssignment.slab.name}` : ""}`
+          : "YOU LOST",
+      )
     } catch (error) {
       await supabase
         .from("duels")
@@ -309,10 +377,10 @@ export function DuelsClient() {
           <h2 className="font-heading text-lg font-extrabold text-foreground">Open duels waiting for an opponent</h2>
         </div>
         <div className="divide-y divide-border">
-          {duels.length === 0 ? (
+          {activeDuels.length === 0 ? (
             <div className="p-5 text-sm text-muted-foreground">No open duels yet.</div>
           ) : (
-            duels.map((duel) => (
+            activeDuels.map((duel) => (
               <div key={duel.id} className="grid gap-4 p-5 md:grid-cols-[1fr_auto] md:items-center">
                 <div className="grid gap-2 text-sm">
                   <div className="font-mono text-xs text-muted-foreground">{duel.eventId}</div>
@@ -357,6 +425,45 @@ export function DuelsClient() {
           )}
         </div>
       </div>
+
+      <div className="mt-10 rounded-2xl border border-border bg-card">
+        <div className="border-b border-border p-5">
+          <h2 className="font-heading text-lg font-extrabold text-foreground">Settled duels history</h2>
+        </div>
+        <div className="divide-y divide-border">
+          {settledDuels.length === 0 ? (
+            <div className="p-5 text-sm text-muted-foreground">No settled duels yet.</div>
+          ) : (
+            settledDuels.map((duel) => {
+              const slab = getAssignedSlab(duel, proofLog, vaultCards)
+              const loserWallet = duel.winnerWallet === duel.playerA ? duel.playerB : duel.playerA
+
+              return (
+                <div key={`${duel.id}-history`} className="grid gap-3 p-5 text-sm md:grid-cols-5 md:items-center">
+                  <div className="font-mono text-xs text-muted-foreground">{duel.eventId}</div>
+                  <div className="text-muted-foreground">Winner: {shortWallet(duel.winnerWallet ?? "-")}</div>
+                  <div className="text-muted-foreground">Loser: {loserWallet ? shortWallet(loserWallet) : "-"}</div>
+                  <div className="text-muted-foreground">{new Date(duel.createdAt).toLocaleDateString()}</div>
+                  <div className="text-muted-foreground">{slab}</div>
+                </div>
+              )
+            })
+          )}
+        </div>
+      </div>
     </section>
   )
+}
+
+function getAssignedSlab(duel: DuelListItem, proofLog: ProofLogRow[], vaultCards: VaultCardRow[]) {
+  const proof = proofLog.find(
+    (record) =>
+      record.event_id === duel.eventId &&
+      (record.event_type === "duel_slab_assignment" || record.event_type === "no_slab_available"),
+  )
+
+  if (!proof?.slab_id) return "Pending"
+
+  const card = vaultCards.find((item) => item.id === proof.slab_id)
+  return card ? `${card.name} (${card.tier})` : proof.slab_id
 }

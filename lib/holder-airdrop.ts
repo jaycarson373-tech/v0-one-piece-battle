@@ -4,27 +4,19 @@ import {
   AIRDROP_INTERVAL_MS,
   AIRDROP_STATE_KEY,
   DRY_RUN,
-  DUEL_RESULTS_KEY,
   SOLANA_RPC_URL,
   SWITCHBOARD_ON_DEMAND_PACKAGE,
   type AirdropResult,
-  type ProofRecord,
   createEventId,
-  readJsonArray,
   sha256Hex,
-  writeJsonArray,
 } from "@/lib/duel-store"
+import { assignAvailableSlab } from "@/lib/vault-proof"
 
 type SwitchboardRandomnessAccount = Randomness
 
 type MockHolder = {
   wallet: string
   tokens: number
-}
-
-type MockVaultCard = {
-  name: string
-  tier: string
 }
 
 export type AirdropState = {
@@ -39,13 +31,6 @@ const mockHolders: MockHolder[] = [
   { wallet: "Bv7Qs1Re222222222222222222222222222222222", tokens: 900_000 },
   { wallet: "3xKpLm0Z333333333333333333333333333333333", tokens: 120_000 },
   { wallet: "Mq2cV7bL444444444444444444444444444444444", tokens: 1_500_000 },
-]
-
-const mockVaultCards: MockVaultCard[] = [
-  { name: "Luffy Leader Alt Art", tier: "LEGENDARY" },
-  { name: "Zoro Manga Parallel", tier: "MYTHIC" },
-  { name: "Nami Parallel Rare", tier: "RARE" },
-  { name: "Sanji Wanted Poster", tier: "COMMON" },
 ]
 
 export function readAirdropState(): AirdropState {
@@ -97,17 +82,21 @@ export async function runHolderAirdropNow(): Promise<AirdropResult> {
     blockhash,
     lastValidBlockHeight,
     JSON.stringify(snapshot),
-    JSON.stringify(mockVaultCards),
   ].join(":")
   const vrfProof = await sha256Hex(`switchboard-airdrop-vrf:${seed}`)
   const holderRoll = Number.parseInt(vrfProof.slice(0, 12), 16) % totalTickets
-  const cardRoll = Number.parseInt(vrfProof.slice(12, 20), 16) % mockVaultCards.length
   const winner = pickWeightedWinner(snapshot, holderRoll)
-  const card = mockVaultCards[cardRoll]
-  const resultHash = await sha256Hex(
-    `${eventId}:${winner.wallet}:${card.name}:${card.tier}:${timestamp}:${vrfProof}:${totalTickets}`,
-  )
+  const resultHash = await sha256Hex(`${eventId}:${winner.wallet}:${timestamp}:${vrfProof}:${totalTickets}`)
   const settlementTx = `dry-run-airdrop-${resultHash.slice(0, 16)}`
+  const slabAssignment = await assignAvailableSlab({
+    eventId,
+    eventType: "holder_airdrop",
+    winnerWallet: winner.wallet,
+    vrfProof,
+    resultHash,
+  })
+  const cardName = slabAssignment.slab?.name ?? "Pending"
+  const cardTier = slabAssignment.slab?.tier ?? "Pending"
   const result: AirdropResult = {
     type: "airdrop",
     eventId,
@@ -117,15 +106,13 @@ export async function runHolderAirdropNow(): Promise<AirdropResult> {
     settlementTx,
     winnerWallet: winner.wallet,
     timestamp,
-    cardName: card.name,
-    cardTier: card.tier,
+    cardName,
+    cardTier,
     holderTickets: winner.tickets,
     totalTickets,
     status: "resolved",
   }
 
-  const nextProofRecords = [result, ...readJsonArray<ProofRecord>(DUEL_RESULTS_KEY)].slice(0, 50)
-  writeJsonArray(DUEL_RESULTS_KEY, nextProofRecords)
   writeAirdropState({
     lastWinnerWallet: result.winnerWallet,
     lastCardPulled: result.cardName,

@@ -1,4 +1,4 @@
-export const DRY_RUN = process.env.NEXT_PUBLIC_DRY_RUN !== "false"
+export const DRY_RUN = process.env.NEXT_PUBLIC_DRY_RUN !== "false" && process.env.DRY_RUN !== "false"
 export const TREASURY_WALLET =
   process.env.NEXT_PUBLIC_TREASURY_WALLET ?? "AuPgBoGhnqdmBE4LnjGoy4uUwRWmfRQDBVGDrbqQtux8"
 export const SOLANA_RPC_URL = process.env.NEXT_PUBLIC_SOLANA_RPC_URL ?? "https://api.devnet.solana.com"

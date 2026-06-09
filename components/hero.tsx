@@ -87,7 +87,7 @@ export function Hero() {
               View Live Duels
             </a>
             <a
-              href="#proof"
+              href="/proof"
               className={buttonVariants({
                 variant: "outline",
                 size: "lg",
@@ -139,7 +139,7 @@ export function Hero() {
                 <span className="live-pulse inline-block h-2 w-2 rounded-full bg-primary" /> Resolving
               </div>
               <span className="rounded-full bg-background/80 px-2.5 py-1 font-mono text-xs font-bold text-foreground">
-                Winner takes $18–100
+                Winner takes a slab
               </span>
             </div>
           </div>

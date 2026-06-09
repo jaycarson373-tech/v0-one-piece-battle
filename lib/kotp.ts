@@ -15,19 +15,19 @@ export type Duel = {
 }
 
 export const liveDuels: Duel[] = [
-  { id: "DUEL-7F3A", stake: 10, status: "live", challenger: "9f2K…D4uM", opponent: "Bv7Q…s1Re", pool: 18, winner: null, ago: "now" },
-  { id: "DUEL-91C2", stake: 10, status: "open", challenger: "3xKp…Lm0Z", opponent: null, pool: 18, winner: null, ago: "12s ago" },
-  { id: "DUEL-22B8", stake: 10, status: "open", challenger: "Az8t…Qh4N", opponent: null, pool: 18, winner: null, ago: "44s ago" },
-  { id: "DUEL-08E1", stake: 10, status: "settled", challenger: "Td5w…Rk9P", opponent: "Mq2c…V7bL", pool: 18, winner: "Td5w…Rk9P", ago: "2m ago" },
-  { id: "DUEL-5C77", stake: 10, status: "settled", challenger: "Yh1n…Gc3X", opponent: "Wf6r…Up2D", pool: 18, winner: "Wf6r…Up2D", ago: "5m ago" },
+  { id: "DUEL-7F3A", stake: 10, status: "live", challenger: "9f2K…D4uM", opponent: "Bv7Q…s1Re", pool: 20, winner: null, ago: "now" },
+  { id: "DUEL-91C2", stake: 10, status: "open", challenger: "3xKp…Lm0Z", opponent: null, pool: 20, winner: null, ago: "12s ago" },
+  { id: "DUEL-22B8", stake: 10, status: "open", challenger: "Az8t…Qh4N", opponent: null, pool: 20, winner: null, ago: "44s ago" },
+  { id: "DUEL-08E1", stake: 10, status: "settled", challenger: "Td5w…Rk9P", opponent: "Mq2c…V7bL", pool: 20, winner: "Td5w…Rk9P", ago: "2m ago" },
+  { id: "DUEL-5C77", stake: 10, status: "settled", challenger: "Yh1n…Gc3X", opponent: "Wf6r…Up2D", pool: 20, winner: "Wf6r…Up2D", ago: "5m ago" },
 ]
 
 export const duelTiers = [
   {
     stake: 10,
     name: "$10 Duel",
-    tagline: "Fast entry. Quick battle. Winner takes the pot.",
-    pool: 18,
+    tagline: "Fast entry. Quick battle. Winner takes a random vault slab.",
+    pool: 20,
     accent: "primary" as const,
     soon: false,
   },
@@ -46,7 +46,7 @@ export const duelFlow = [
   "Select a $10 Duel",
   "Create or Accept Challenge",
   "Randomness Resolves Battle",
-  "Winner Paid / Proof Posted",
+  "Slab Reserved / Proof Posted",
 ]
 
 // ---- Proof Terminal ----
@@ -65,52 +65,7 @@ export type ProofRecord = {
   status: "Settled" | "Pending" | "Resolving"
 }
 
-export const proofRecords: ProofRecord[] = [
-  {
-    eventId: "EVT-0x9A41",
-    type: "Duel",
-    wallets: ["9f2K…D4uM", "Bv7Q…s1Re"],
-    wager: "$10",
-    randomnessProof: "vrf:7c1f…a902",
-    resultHash: "0x4d8e…11bc",
-    winner: "Bv7Q…s1Re",
-    settlementTx: "5Ht9…Qz2m",
-    status: "Settled",
-  },
-  {
-    eventId: "EVT-0x9A40",
-    type: "Holder Airdrop",
-    wallets: ["snapshot · 1,284 holders"],
-    wager: "—",
-    randomnessProof: "vrf:2b6d…ff31",
-    resultHash: "0x77a2…90de",
-    winner: "Kp3x…Lz8Q",
-    settlementTx: "8Jd2…Rk1p",
-    status: "Settled",
-  },
-  {
-    eventId: "EVT-0x9A3F",
-    type: "Card Selection",
-    wallets: ["vault pool · 612 cards"],
-    wager: "—",
-    randomnessProof: "vrf:9e0a…c7b4",
-    resultHash: "0x12fb…44a1",
-    winner: "Zoro · Alt Art (EPIC)",
-    settlementTx: "2Gh7…Tn5w",
-    status: "Settled",
-  },
-  {
-    eventId: "EVT-0x9A3E",
-    type: "Duel",
-    wallets: ["3xKp…Lm0Z", "Mq2c…V7bL"],
-    wager: "$10",
-    randomnessProof: "vrf:committed",
-    resultHash: "pending",
-    winner: "—",
-    settlementTx: "—",
-    status: "Resolving",
-  },
-]
+export const proofRecords: ProofRecord[] = []
 
 // ---- Treasury Vault ----
 
@@ -124,8 +79,7 @@ export const treasuryStats = [
 ]
 
 export const treasurySplit = [
-  { pct: 50, label: "Buy cards for holder airdrops", color: "var(--primary)" },
-  { pct: 50, label: "Buy more cards for the vault", color: "var(--gold)" },
+  { pct: 100, label: "Duel entries go to the treasury", color: "var(--primary)" },
 ]
 
 export const cardTiers = [
@@ -184,7 +138,7 @@ export const kotpHowSteps = [
   {
     step: "03",
     title: "Treasury",
-    body: "Fees flow into the treasury. Treasury funds are used to buy real cards and slabs.",
+    body: "Duel entries flow into the treasury. Treasury funds are used to buy real cards and slabs.",
   },
   {
     step: "04",
@@ -197,3 +151,5 @@ export const kotpHowSteps = [
     body: "Every duel, winner, card selection, and airdrop is logged with hashes, transactions, and verification data.",
   },
 ]
+
+
