@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
+import bs58 from "bs58"
 import { Connection, Keypair, PublicKey, Transaction } from "@solana/web3.js"
 import {
   createAssociatedTokenAccountInstruction,
@@ -136,11 +137,17 @@ export async function POST(request: Request) {
 }
 
 function readTreasuryKeypair() {
-  const raw = process.env.TREASURY_WALLET_PRIVATE_KEY
-  if (!raw) throw new Error("TREASURY_WALLET_PRIVATE_KEY is missing.")
+  const rawKey = process.env.TREASURY_WALLET_PRIVATE_KEY
+  if (!rawKey) throw new Error("TREASURY_WALLET_PRIVATE_KEY is missing.")
 
-  const secret = JSON.parse(raw) as number[]
-  return Keypair.fromSecretKey(Uint8Array.from(secret))
+  let secretKey: Uint8Array
+  try {
+    secretKey = Uint8Array.from(JSON.parse(rawKey))
+  } catch {
+    secretKey = bs58.decode(rawKey)
+  }
+
+  return Keypair.fromSecretKey(secretKey)
 }
 
 function getServerSupabaseClient() {
