@@ -17,6 +17,16 @@ const tierClass: Record<string, string> = {
   MYTHIC: "border-gold text-primary",
 }
 
+const PHYGITALS_URL = "https://www.phygitals.com/u/IceChallenger429"
+
+const cardImages: Record<string, string> = {
+  "Luffy OP07-109": "/cards/card-001.png",
+  "Luffy P-001 Promo": "/cards/card-002.png",
+  "Ace Championship": "/cards/card-003.png",
+  "Luffy P-022 Film Red": "/cards/card-004.png",
+  "Shanks P-083 Tournament": "/cards/card-005.png",
+}
+
 export function VaultClient() {
   const [cards, setCards] = useState<VaultCardRow[]>([])
   const [message, setMessage] = useState("")
@@ -109,7 +119,8 @@ export function VaultClient() {
             <div className="p-5 text-sm text-muted-foreground">Vault is being stocked. Check back soon.</div>
           ) : (
             cards.map((card) => (
-              <div key={card.id} className="grid gap-4 p-5 md:grid-cols-[1fr_auto] md:items-center">
+              <div key={card.id} className="grid gap-4 p-5 md:grid-cols-[96px_1fr_auto] md:items-center">
+                <CardImage card={card} />
                 <div className="grid gap-2 text-sm">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-heading text-xl font-extrabold text-foreground">{card.name}</span>
@@ -129,8 +140,46 @@ export function VaultClient() {
             ))
           )}
         </div>
+        {cards.length > 0 && (
+          <div className="border-t border-border p-5 text-center">
+            <a
+              href={PHYGITALS_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="font-heading text-sm font-extrabold uppercase tracking-wide text-gold hover:text-primary"
+            >
+              View Full Vault
+            </a>
+          </div>
+        )}
+      </div>
+
+      <div className="mt-6 text-center text-sm text-muted-foreground">
+        <a href={PHYGITALS_URL} target="_blank" rel="noreferrer" className="text-gold hover:text-primary">
+          Full inventory verified on Phygitals
+        </a>
       </div>
     </section>
+  )
+}
+
+function CardImage({ card }: { card: VaultCardRow }) {
+  const image = cardImages[card.name]
+
+  if (!image) {
+    return (
+      <div className="flex h-28 w-20 items-center justify-center rounded-xl border border-border bg-background text-center text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+        No image
+      </div>
+    )
+  }
+
+  return (
+    <img
+      src={image}
+      alt={card.name}
+      className="h-28 w-20 rounded-xl border border-border bg-background object-cover"
+    />
   )
 }
 

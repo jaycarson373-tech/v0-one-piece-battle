@@ -78,6 +78,8 @@ export function DuelsClient() {
   const [proofLog, setProofLog] = useState<ProofLogRow[]>([])
   const [vaultCards, setVaultCards] = useState<VaultCardRow[]>([])
   const [message, setMessage] = useState("")
+  const [claimMessage, setClaimMessage] = useState("")
+  const [claimDuelId, setClaimDuelId] = useState("")
   const [resolvingDuelId, setResolvingDuelId] = useState("")
   const activeDuels = duels.filter((duel) => duel.status !== "settled")
   const settledDuels = duels.filter((duel) => duel.status === "settled")
@@ -197,6 +199,9 @@ export function DuelsClient() {
   }, [])
 
   async function startDuel(stake: DuelStake) {
+    setClaimMessage("")
+    setClaimDuelId("")
+
     if (!wallet) {
       setMessage("Connect Phantom in the nav before starting a duel.")
       return
@@ -229,6 +234,8 @@ export function DuelsClient() {
 
   async function cancelDuel(duel: DuelListItem) {
     if (wallet !== duel.playerA || duel.status !== "open") return
+    setClaimMessage("")
+    setClaimDuelId("")
 
     const supabase = getSupabaseDuelsClient()
     if (!supabase) {
@@ -264,6 +271,8 @@ export function DuelsClient() {
     }
 
     setResolvingDuelId(duel.id)
+    setClaimMessage("")
+    setClaimDuelId("")
     setMessage("DRY_RUN=true: requesting Switchboard VRF dry-run resolution.")
 
     try {
@@ -317,10 +326,14 @@ export function DuelsClient() {
       if (resolvedError) throw resolvedError
 
       setDuels((items) => items.map((item) => (item.id === duel.id ? mapSupabaseDuel(resolvedDuel) : item)))
+      const wonAssignedSlab = resolution.winnerWallet === wallet && Boolean(slabAssignment.slab)
+      setClaimDuelId(wonAssignedSlab ? duel.id : "")
       setMessage(
-        resolution.winnerWallet === wallet
-          ? `YOU WON 🏴‍☠️${slabAssignment.slab ? ` - slab reserved: ${slabAssignment.slab.name}` : ""}`
-          : "YOU LOST",
+        wonAssignedSlab
+          ? "🏴‍☠️ You won! Check your wallet — your slab has been assigned. We will ship it to you when you claim."
+          : resolution.winnerWallet === wallet
+            ? "YOU WON 🏴‍☠️"
+            : "YOU LOST",
       )
     } catch (error) {
       await supabase
@@ -369,6 +382,18 @@ export function DuelsClient() {
       {message && (
         <div className="mt-6 rounded-2xl border border-gold/40 bg-secondary p-4 text-sm font-medium text-foreground">
           {message}
+          {claimDuelId && (
+            <div className="mt-4 flex flex-col items-start gap-3">
+              <button
+                type="button"
+                onClick={() => setClaimMessage("We will contact you to arrange shipment.")}
+                className="rounded-full bg-primary px-5 py-2 text-sm font-bold text-primary-foreground"
+              >
+                Claim My Slab
+              </button>
+              {claimMessage && <div className="text-sm text-muted-foreground">{claimMessage}</div>}
+            </div>
+          )}
         </div>
       )}
 
