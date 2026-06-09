@@ -54,7 +54,7 @@ export async function payDuelEntryUsdc(stake: DuelStake): Promise<DuelPaymentRes
 
   transaction.add(createTransferCheckedInstruction(sourceAta, mint, treasuryAta, payer, amount, USDC_DECIMALS))
 
-  const { blockhash } = await connection.getLatestBlockhash("confirmed")
+  const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("confirmed")
   transaction.feePayer = payer
   transaction.recentBlockhash = blockhash
 
@@ -82,6 +82,22 @@ export async function payDuelEntryUsdc(stake: DuelStake): Promise<DuelPaymentRes
   }
 
   const sent = await provider.signAndSendTransaction!(transaction)
+  await connection.confirmTransaction(
+    {
+      signature: sent.signature,
+      blockhash,
+      lastValidBlockHeight,
+    },
+    "confirmed",
+  )
+
+  console.info("USDC duel payment confirmed", {
+    stake,
+    signature: sent.signature,
+    treasury: TREASURY_WALLET,
+    mint: USDC_MINT,
+  })
+
   return {
     signature: sent.signature,
     dryRun: false,

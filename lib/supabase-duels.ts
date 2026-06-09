@@ -29,6 +29,7 @@ export type VaultCardRow = {
   status: VaultCardStatus
   assigned_to: string | null
   assigned_at: string | null
+  nft_mint_address: string | null
   created_at: string
 }
 
@@ -71,6 +72,7 @@ type Database = {
           status?: VaultCardStatus
           assigned_to?: string | null
           assigned_at?: string | null
+          nft_mint_address?: string | null
           created_at?: string
         }
         Update: Partial<Omit<VaultCardRow, "id" | "created_at">>
