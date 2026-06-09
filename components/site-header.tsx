@@ -7,6 +7,7 @@ import { navLinks } from "@/lib/data"
 import { WalletButton } from "@/components/wallet-button"
 
 const CONTRACT_ADDRESS = "4KvrMmVDWpmUvQsRxVnWS8RQkByJZqfYyfL3RpQNpump"
+const DEXSCREENER_URL = "https://dexscreener.com/solana/G6Qoc48WvPUobQMth8GhdZQMwSPc1CcPfpsx6FZTDUfu"
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false)
@@ -49,6 +50,14 @@ export function SiteHeader() {
             className="hidden h-10 w-10 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
           >
             <XIcon className="h-4 w-4" />
+          </a>
+          <a
+            href={DEXSCREENER_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="hidden rounded-full border border-border px-3 py-2 text-xs font-bold text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
+          >
+            DEX
           </a>
           <button
             type="button"
