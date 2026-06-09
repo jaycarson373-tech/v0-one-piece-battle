@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import bs58 from "bs58"
-import { Connection, Keypair, PublicKey, Transaction } from "@solana/web3.js"
-import {
-  createAssociatedTokenAccountInstruction,
-  createTransferCheckedInstruction,
-  getAssociatedTokenAddressSync,
-} from "@solana/spl-token"
+import { Keypair } from "@solana/web3.js"
+import { getAssetWithProof, mplBubblegum, transfer } from "@metaplex-foundation/mpl-bubblegum"
+import { createSignerFromKeypair, publicKey, signerIdentity } from "@metaplex-foundation/umi"
+import { createUmi } from "@metaplex-foundation/umi-bundle-defaults"
+import { fromWeb3JsKeypair } from "@metaplex-foundation/umi-web3js-adapters"
 
 type SendSlabRequest = {
   eventId: string
@@ -62,34 +61,24 @@ export async function POST(request: Request) {
 
   try {
     const treasury = readTreasuryKeypair()
-    const connection = new Connection(process.env.NEXT_PUBLIC_SOLANA_RPC_URL ?? "https://api.devnet.solana.com", "confirmed")
-    const mint = new PublicKey(nftMintAddress)
-    const winner = new PublicKey(input.winnerWallet)
-    const sourceAta = getAssociatedTokenAddressSync(mint, treasury.publicKey)
-    const destinationAta = getAssociatedTokenAddressSync(mint, winner)
-    const transaction = new Transaction()
+    const rpcUrl = process.env.NEXT_PUBLIC_SOLANA_RPC_URL ?? "https://api.mainnet-beta.solana.com"
+    const umi = createUmi(rpcUrl).use(mplBubblegum())
+    const treasurySigner = createSignerFromKeypair(umi, fromWeb3JsKeypair(treasury))
+    umi.use(signerIdentity(treasurySigner))
 
-    const destinationAccount = await connection.getAccountInfo(destinationAta)
-    if (!destinationAccount) {
-      transaction.add(createAssociatedTokenAccountInstruction(treasury.publicKey, destinationAta, winner, mint))
-    }
-
-    transaction.add(createTransferCheckedInstruction(sourceAta, mint, destinationAta, treasury.publicKey, 1n, 0))
-
-    const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("confirmed")
-    transaction.feePayer = treasury.publicKey
-    transaction.recentBlockhash = blockhash
-    transaction.sign(treasury)
-
-    const signature = await connection.sendRawTransaction(transaction.serialize())
-    await connection.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, "confirmed")
+    const assetWithProof = await getAssetWithProof(umi, publicKey(nftMintAddress))
+    const signature = await transfer(umi, {
+      ...assetWithProof,
+      leafOwner: treasurySigner,
+      newLeafOwner: publicKey(input.winnerWallet),
+    }).sendAndConfirm(umi)
 
     console.info("Treasury NFT slab transfer confirmed", {
       eventId: input.eventId,
       slabId: input.slabId,
       winnerWallet: input.winnerWallet,
       nftMintAddress,
-      signature,
+      signature: bs58.encode(signature.signature),
     })
 
     const { error: updateError } = await supabase
@@ -105,12 +94,12 @@ export async function POST(request: Request) {
       console.error("NFT sent but failed to mark slab airdropped in Supabase", {
         slabId: input.slabId,
         winnerWallet: input.winnerWallet,
-        signature,
+        signature: bs58.encode(signature.signature),
         error: updateError,
       })
       return NextResponse.json({
         dryRun: false,
-        signature,
+        signature: bs58.encode(signature.signature),
         sent: true,
         status: "sent_update_failed",
         error: updateError.message,
@@ -123,10 +112,10 @@ export async function POST(request: Request) {
       winnerWallet: input.winnerWallet,
       status: "airdropped",
       dryRun: false,
-      signature,
+      signature: bs58.encode(signature.signature),
     })
 
-    return NextResponse.json({ dryRun: false, signature, sent: true, status: "airdropped" })
+    return NextResponse.json({ dryRun: false, signature: bs58.encode(signature.signature), sent: true, status: "airdropped" })
   } catch (error) {
     console.error("Treasury NFT slab transfer failed", error)
     return NextResponse.json(
