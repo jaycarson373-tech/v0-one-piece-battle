@@ -25,7 +25,7 @@ import {
   type VaultCardRow,
 } from "@/lib/supabase-duels"
 import { resolveDuelWithSwitchboardVrf } from "@/lib/switchboard-vrf"
-import { assignAvailableSlab, settleDuelUsdcPayout } from "@/lib/vault-proof"
+import { assignAvailableSlab, settleDuelTreasuryReceipt } from "@/lib/vault-proof"
 
 type DuelListItem = OpenDuel & {
   status: "open" | "resolving" | "settled"
@@ -288,12 +288,10 @@ export function DuelsClient() {
         stake: duel.stake,
         timestamp,
       })
-      const loserWallet = resolution.winnerWallet === duel.playerA ? wallet : duel.playerA
-
-      await settleDuelUsdcPayout({
+      await settleDuelTreasuryReceipt({
         eventId: duel.eventId,
-        winnerWallet: resolution.winnerWallet,
-        loserWallet,
+        playerA: duel.playerA,
+        playerB: wallet,
       })
       const slabAssignment = await assignAvailableSlab({
         eventId: duel.eventId,

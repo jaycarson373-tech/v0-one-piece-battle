@@ -23,7 +23,7 @@ export function TreasuryVault() {
           Fees become real cards.
         </h2>
         <p className="mt-3 max-w-2xl text-pretty leading-relaxed text-muted-foreground">
-          Duel fees feed the treasury. The treasury buys real cards and slabs, then uses them for holder
+          Duel entries feed the treasury. The treasury buys real cards and slabs, then uses them for holder
           airdrops, duel prizes, and vault growth.
         </p>
 

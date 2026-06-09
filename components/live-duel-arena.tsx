@@ -50,7 +50,7 @@ export function LiveDuelArena() {
         </h2>
         <p className="mt-3 max-w-2xl text-pretty leading-relaxed text-muted-foreground">
           Pick your stake, lock the duel, and wait for an opponent. Once accepted, the battle resolves through
-          verifiable randomness and the winner takes the prize pool.
+          verifiable randomness and the winner takes a slab from the vault.
         </p>
 
         {/* duel tiers */}
@@ -73,8 +73,8 @@ export function LiveDuelArena() {
               <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">{t.tagline}</p>
               {!t.soon && (
                 <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
-                  <span className="text-xs uppercase tracking-wider text-muted-foreground">Winner takes</span>
-                  <span className="font-heading text-lg font-extrabold text-foreground">${t.pool}</span>
+                  <span className="text-xs uppercase tracking-wider text-muted-foreground">Prize</span>
+                  <span className="font-heading text-lg font-extrabold text-foreground">Vault slab</span>
                 </div>
               )}
               <button

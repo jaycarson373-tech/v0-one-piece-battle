@@ -97,7 +97,7 @@ export const featuredPrize: PrizeCard = {
   value: 410,
 }
 
-// The full prize pool the winner's slab is drawn from — a "pack" of slabs held in
+// The slab pool the winner's prize is drawn from — a "pack" of slabs held in
 // the treasury vault. Each battle deterministically draws one card from this pool
 // using the same public seed, so the drop is as verifiable as the matchup itself.
 // `weight` controls drop odds (higher = more common).

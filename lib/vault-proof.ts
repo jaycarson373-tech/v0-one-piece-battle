@@ -95,28 +95,27 @@ export async function postProofRecord(input: Omit<ProofLogRow, "timestamp">): Pr
   return data
 }
 
-export async function settleDuelUsdcPayout(input: {
+export async function settleDuelTreasuryReceipt(input: {
   eventId: string
-  winnerWallet: string
-  loserWallet: string
+  playerA: string
+  playerB: string
 }) {
   if (DRY_RUN) {
-    console.info("DRY_RUN=true: simulated duel payout", {
+    console.info("DRY_RUN=true: simulated full duel entry receipt to treasury", {
       eventId: input.eventId,
-      winnerWallet: input.winnerWallet,
-      loserWallet: input.loserWallet,
-      winnerUsdc: 18,
-      treasuryFeeUsdc: 2,
-      duelWallet: process.env.NEXT_PUBLIC_DUEL_WALLET ?? "",
+      playerA: input.playerA,
+      playerB: input.playerB,
+      playerAUsdc: 10,
+      playerBUsdc: 10,
+      treasuryUsdc: 20,
       treasuryWallet: process.env.NEXT_PUBLIC_TREASURY_WALLET ?? "",
     })
     return {
-      winnerSignature: "dry-run-winner-usdc",
-      treasurySignature: "dry-run-treasury-fee",
+      receiptSignature: "dry-run-full-duel-treasury-receipt",
     }
   }
 
-  throw new Error("Live duel payout transfers are not enabled yet.")
+  throw new Error("Live duel treasury receipt transfers are not enabled yet.")
 }
 
 async function sendSlabToWinner(input: { slabId: string; winnerWallet: string; eventId: string }) {
