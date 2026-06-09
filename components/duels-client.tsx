@@ -25,6 +25,7 @@ import {
   type VaultCardRow,
 } from "@/lib/supabase-duels"
 import { resolveDuelWithSwitchboardVrf } from "@/lib/switchboard-vrf"
+import { payDuelEntryUsdc } from "@/lib/solana-usdc"
 import { assignAvailableSlab, settleDuelTreasuryReceipt } from "@/lib/vault-proof"
 
 type DuelListItem = OpenDuel & {
@@ -234,24 +235,30 @@ export function DuelsClient() {
       return
     }
 
-    const { data, error } = await supabase
-      .from("duels")
-      .insert({
-        id: createEventId(),
-        creator_wallet: wallet,
-        status: "open",
-      })
-      .select()
-      .single()
+    try {
+      const payment = await payDuelEntryUsdc(stake)
 
-    if (error) {
-      setMessage(error.message)
-      return
+      const { data, error } = await supabase
+        .from("duels")
+        .insert({
+          id: createEventId(),
+          creator_wallet: wallet,
+          status: "open",
+        })
+        .select()
+        .single()
+
+      if (error) {
+        setMessage(error.message)
+        return
+      }
+
+      setDuels((items) => sortDuels([mapSupabaseDuel(data), ...items.filter((item) => item.id !== data.id)]))
+      console.info("Duel opened after USDC payment", { eventId: data.id, stake, wallet, payment })
+      setMessage("Duel opened.")
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "USDC payment failed.")
     }
-
-    setDuels((items) => sortDuels([mapSupabaseDuel(data), ...items.filter((item) => item.id !== data.id)]))
-    console.info("DRY_RUN=true: duel opened", { eventId: data.id, stake, wallet })
-    setMessage("Duel opened.")
   }
 
   async function cancelDuel(duel: DuelListItem) {
@@ -298,6 +305,9 @@ export function DuelsClient() {
     setMessage("Resolving duel.")
 
     try {
+      const payment = await payDuelEntryUsdc(duel.stake)
+      console.info("Duel acceptance USDC payment confirmed", { eventId: duel.id, wallet, payment })
+
       const { data: resolvingDuel, error: resolvingError } = await supabase
         .from("duels")
         .update({ status: "resolving", acceptor_wallet: wallet })
