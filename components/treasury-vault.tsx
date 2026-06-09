@@ -17,16 +17,35 @@ import {
 
 export function TreasuryVault() {
   const [cards, setCards] = useState<VaultCardRow[]>([])
-  const [lastWinnerWallet, setLastWinnerWallet] = useState("")
+  const [proofLog, setProofLog] = useState<ProofLogRow[]>([])
 
   const totalValue = useMemo(() => cards.reduce((sum, card) => sum + Number(card.value_usd), 0), [cards])
+  const duelWinnerSlabIds = useMemo(
+    () =>
+      new Set(
+        proofLog
+          .filter((proof) => proof.event_type === "duel_slab_assignment" && proof.slab_id)
+          .map((proof) => proof.slab_id as string),
+      ),
+    [proofLog],
+  )
+  const lastHolderWinner = proofLog.find(
+    (proof) => proof.event_type === "holder_airdrop" && isRealWinnerWallet(proof.winner_wallet),
+  )?.winner_wallet
   const treasuryStats: { label: string; value: ReactNode; accent?: boolean }[] = [
     { label: "Treasury Balance", value: formatUsd(totalValue), accent: true },
     { label: "Cards Purchased", value: cards.length.toString() },
     { label: "Cards Available", value: cards.filter((card) => card.status === "available").length.toString() },
     { label: "Next Airdrop", value: <AirdropCountdown />, accent: true },
-    { label: "Total Airdropped", value: cards.filter((card) => card.status === "airdropped").length.toString() },
-    { label: "Last Winner", value: lastWinnerWallet ? shortWallet(lastWinnerWallet) : "-" },
+    {
+      label: "Airdropped to Duel Winners",
+      value: cards.filter((card) => card.assigned_to && duelWinnerSlabIds.has(card.id)).length.toString(),
+    },
+    {
+      label: "Airdropped to Holders",
+      value: proofLog.filter((proof) => proof.event_type === "holder_airdrop").length.toString(),
+    },
+    { label: "Last Winner", value: lastHolderWinner ? shortWallet(lastHolderWinner) : "-" },
   ]
 
   useEffect(() => {
@@ -36,16 +55,11 @@ export function TreasuryVault() {
     async function loadStats() {
       const [cardsResponse, proofResponse] = await Promise.all([
         supabase.from("vault_cards").select("*").order("created_at", { ascending: false }),
-        supabase
-          .from("proof_log")
-          .select("*")
-          .eq("event_type", "holder_airdrop")
-          .order("timestamp", { ascending: false })
-          .limit(1),
+        supabase.from("proof_log").select("*").order("timestamp", { ascending: false }),
       ])
 
       setCards(cardsResponse.data ?? [])
-      setLastWinnerWallet(proofResponse.data?.[0]?.winner_wallet ?? "")
+      setProofLog(proofResponse.data ?? [])
     }
 
     const vaultChannel = supabase
@@ -70,9 +84,7 @@ export function TreasuryVault() {
         if (payload.eventType === "DELETE") return
 
         const proof = payload.new as ProofLogRow
-        if (proof.event_type === "holder_airdrop") {
-          setLastWinnerWallet(proof.winner_wallet ?? "")
-        }
+        setProofLog((items) => [proof, ...items.filter((item) => item.event_id !== proof.event_id)])
       })
       .subscribe()
 
@@ -164,4 +176,9 @@ export function TreasuryVault() {
 
 function formatUsd(value: number) {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value)
+}
+
+function isRealWinnerWallet(wallet: string | null) {
+  if (!wallet) return false
+  return !/(111111|222222|333333|444444)/.test(wallet)
 }
