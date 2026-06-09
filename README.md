@@ -10,6 +10,19 @@ This repository is linked to a [v0](https://v0.app) project. You can continue de
 
 ## Getting Started
 
+## Environment
+
+Use one treasury wallet for duel payments, treasury custody, and slab sends:
+
+```env
+DRY_RUN=true
+NEXT_PUBLIC_DRY_RUN=true
+TREASURY_WALLET_PRIVATE_KEY=
+NEXT_PUBLIC_TREASURY_WALLET=
+NEXT_PUBLIC_SOLANA_RPC_URL=
+NEXT_PUBLIC_USDC_MINT=
+```
+
 First, run the development server:
 
 ```bash
