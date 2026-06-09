@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Menu, X } from "lucide-react"
+import { Menu, X as XIcon } from "lucide-react"
 import { Logo } from "./logo"
 import { navLinks } from "@/lib/data"
 import { WalletButton } from "@/components/wallet-button"
@@ -32,6 +32,18 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <a
+            href="https://x.com/KOTPirates_"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="King of the Pirates on X"
+            className="hidden h-10 w-10 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
+          >
+            <XIcon className="h-4 w-4" />
+          </a>
+          <span className="hidden rounded-full border border-border px-3 py-2 font-mono text-xs font-bold text-muted-foreground sm:inline-flex">
+            CA: TBA
+          </span>
           <WalletButton className="hidden gap-2 rounded-full sm:inline-flex" />
           <button
             className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border lg:hidden"
@@ -39,7 +51,7 @@ export function SiteHeader() {
             aria-label="Toggle menu"
             aria-expanded={open}
           >
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {open ? <XIcon className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
