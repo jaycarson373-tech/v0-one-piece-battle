@@ -14,14 +14,14 @@ export function Hero() {
       {/* pirate duel arena backdrop */}
       <div className="pointer-events-none absolute inset-0 z-0">
         <img
-          src="/images/op-faceoff-spiral.jpeg"
+          src="/bg/battle.png"
           alt=""
           aria-hidden="true"
           className="h-full w-full object-cover object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/80 to-background" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-transparent to-background/90" />
-        <div className="slash-lines absolute inset-0 opacity-60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/55 via-background/45 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/70 via-transparent to-background/30" />
+        <div className="slash-lines absolute inset-0 opacity-40" />
       </div>
 
       <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-14 sm:pt-20 lg:grid-cols-[1.1fr_0.9fr]">
@@ -139,7 +139,7 @@ export function Hero() {
                 <span className="live-pulse inline-block h-2 w-2 rounded-full bg-primary" /> Resolving
               </div>
               <span className="rounded-full bg-background/80 px-2.5 py-1 font-mono text-xs font-bold text-foreground">
-                Winner takes $90
+                Winner takes $18–100
               </span>
             </div>
           </div>
