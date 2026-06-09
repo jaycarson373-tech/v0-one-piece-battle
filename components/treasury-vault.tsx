@@ -1,7 +1,87 @@
+"use client"
+
+import { useEffect, useMemo, useState, type ReactNode } from "react"
 import { Vault as VaultIcon, ArrowRight } from "lucide-react"
-import { treasuryStats, treasurySplit, cardTiers } from "@/lib/kotp"
+import { treasurySplit, cardTiers } from "@/lib/kotp"
+import { AirdropCountdown } from "@/components/airdrop-countdown"
+import { shortWallet } from "@/lib/duel-store"
+import {
+  getSupabaseDuelsClient,
+  PROOF_LOG_REALTIME_CHANNEL,
+  PROOF_LOG_REALTIME_FILTER,
+  VAULT_CARDS_REALTIME_CHANNEL,
+  VAULT_CARDS_REALTIME_FILTER,
+  type ProofLogRow,
+  type VaultCardRow,
+} from "@/lib/supabase-duels"
 
 export function TreasuryVault() {
+  const [cards, setCards] = useState<VaultCardRow[]>([])
+  const [lastWinnerWallet, setLastWinnerWallet] = useState("")
+
+  const totalValue = useMemo(() => cards.reduce((sum, card) => sum + Number(card.value_usd), 0), [cards])
+  const treasuryStats: { label: string; value: ReactNode; accent?: boolean }[] = [
+    { label: "Treasury Balance", value: formatUsd(totalValue), accent: true },
+    { label: "Cards Purchased", value: cards.length.toString() },
+    { label: "Cards Available", value: cards.filter((card) => card.status === "available").length.toString() },
+    { label: "Next Airdrop", value: <AirdropCountdown />, accent: true },
+    { label: "Total Airdropped", value: cards.filter((card) => card.status === "airdropped").length.toString() },
+    { label: "Last Winner", value: lastWinnerWallet ? shortWallet(lastWinnerWallet) : "-" },
+  ]
+
+  useEffect(() => {
+    const supabase = getSupabaseDuelsClient()
+    if (!supabase) return
+
+    async function loadStats() {
+      const [cardsResponse, proofResponse] = await Promise.all([
+        supabase.from("vault_cards").select("*").order("created_at", { ascending: false }),
+        supabase
+          .from("proof_log")
+          .select("*")
+          .eq("event_type", "holder_airdrop")
+          .order("timestamp", { ascending: false })
+          .limit(1),
+      ])
+
+      setCards(cardsResponse.data ?? [])
+      setLastWinnerWallet(proofResponse.data?.[0]?.winner_wallet ?? "")
+    }
+
+    const vaultChannel = supabase
+      .channel(`${VAULT_CARDS_REALTIME_CHANNEL}:homepage-treasury`)
+      .on("postgres_changes", VAULT_CARDS_REALTIME_FILTER, (payload) => {
+        if (payload.eventType === "DELETE") {
+          const deleted = payload.old as Partial<VaultCardRow>
+          setCards((items) => items.filter((item) => item.id !== deleted.id))
+          return
+        }
+
+        const nextCard = payload.new as VaultCardRow
+        setCards((items) => [nextCard, ...items.filter((item) => item.id !== nextCard.id)])
+      })
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") void loadStats()
+      })
+
+    const proofChannel = supabase
+      .channel(`${PROOF_LOG_REALTIME_CHANNEL}:homepage-treasury`)
+      .on("postgres_changes", PROOF_LOG_REALTIME_FILTER, (payload) => {
+        if (payload.eventType === "DELETE") return
+
+        const proof = payload.new as ProofLogRow
+        if (proof.event_type === "holder_airdrop") {
+          setLastWinnerWallet(proof.winner_wallet ?? "")
+        }
+      })
+      .subscribe()
+
+    return () => {
+      void supabase.removeChannel(vaultChannel)
+      void supabase.removeChannel(proofChannel)
+    }
+  }, [])
+
   return (
     <section id="vault" className="relative overflow-hidden border-b border-border">
       {/* vault backdrop */}
@@ -80,4 +160,8 @@ export function TreasuryVault() {
       </div>
     </section>
   )
+}
+
+function formatUsd(value: number) {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value)
 }
