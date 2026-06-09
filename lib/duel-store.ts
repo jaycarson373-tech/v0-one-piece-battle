@@ -13,7 +13,7 @@ export const WALLET_EVENT = "kotp-wallet-change"
 export const DUEL_EVENT = "kotp-duel-change"
 export const AIRDROP_INTERVAL_MS = 60 * 60 * 1000
 
-export type DuelStake = 10 | 50
+export type DuelStake = 10
 
 export type OpenDuel = {
   id: string

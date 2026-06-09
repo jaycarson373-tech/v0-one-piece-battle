@@ -17,6 +17,7 @@ import {
   USDC_MINT,
   WALLET_EVENT,
 } from "@/lib/duel-store"
+import { getSupabaseDuelsClient, type SupabaseDuelRow } from "@/lib/supabase-duels"
 import { resolveDuelWithSwitchboardVrf } from "@/lib/switchboard-vrf"
 
 type DuelListItem = OpenDuel & {
@@ -42,11 +43,80 @@ function useConnectedWallet() {
   return wallet
 }
 
+function mapSupabaseDuel(row: SupabaseDuelRow): DuelListItem {
+  return {
+    id: row.id,
+    eventId: row.id,
+    stake: 10,
+    playerA: row.creator_wallet,
+    playerB: row.acceptor_wallet ?? undefined,
+    createdAt: row.created_at,
+    dryRun: true,
+    token: "USDC",
+    mint: USDC_MINT,
+    treasuryWallet: TREASURY_WALLET,
+    paymentSignature: "dry-run-supabase",
+    status: row.status === "resolved" ? "settled" : row.status,
+    winnerWallet: row.winner_wallet ?? undefined,
+  }
+}
+
+function sortDuels(items: DuelListItem[]) {
+  return [...items].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
+}
+
 export function DuelsClient() {
   const wallet = useConnectedWallet()
   const [duels, setDuels] = useState<DuelListItem[]>([])
   const [message, setMessage] = useState("")
   const [resolvingDuelId, setResolvingDuelId] = useState("")
+
+  useEffect(() => {
+    const supabase = getSupabaseDuelsClient()
+
+    if (!supabase) {
+      setMessage("Supabase env vars are missing. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.")
+      return
+    }
+
+    async function loadDuels() {
+      const { data, error } = await supabase
+        .from("duels")
+        .select("*")
+        .in("status", ["open", "resolving", "resolved"])
+        .order("created_at", { ascending: false })
+
+      if (error) {
+        setMessage(error.message)
+        return
+      }
+
+      setDuels((data ?? []).map(mapSupabaseDuel))
+    }
+
+    void loadDuels()
+
+    const channel = supabase
+      .channel("kotp-duels")
+      .on("postgres_changes", { event: "*", schema: "public", table: "duels" }, (payload) => {
+        if (payload.eventType === "DELETE") {
+          const deleted = payload.old as Partial<SupabaseDuelRow>
+          setDuels((items) => items.filter((item) => item.id !== deleted.id))
+          return
+        }
+
+        const nextDuel = mapSupabaseDuel(payload.new as SupabaseDuelRow)
+        setDuels((items) => {
+          const existing = items.filter((item) => item.id !== nextDuel.id)
+          return sortDuels([nextDuel, ...existing])
+        })
+      })
+      .subscribe()
+
+    return () => {
+      void supabase.removeChannel(channel)
+    }
+  }, [])
 
   async function startDuel(stake: DuelStake) {
     if (!wallet) {
@@ -54,26 +124,45 @@ export function DuelsClient() {
       return
     }
 
-    const nextDuel: DuelListItem = {
-      id: createEventId(),
-      eventId: createEventId(),
-      stake,
-      playerA: wallet,
-      createdAt: new Date().toISOString(),
-      dryRun: true,
-      token: "USDC",
-      mint: USDC_MINT,
-      treasuryWallet: TREASURY_WALLET,
-      paymentSignature: "dry-run-in-memory",
-      status: "open",
+    const supabase = getSupabaseDuelsClient()
+    if (!supabase) {
+      setMessage("Supabase env vars are missing. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.")
+      return
     }
 
-    setDuels((items) => [nextDuel, ...items])
+    const { data, error } = await supabase
+      .from("duels")
+      .insert({
+        id: createEventId(),
+        creator_wallet: wallet,
+        status: "open",
+      })
+      .select()
+      .single()
+
+    if (error) {
+      setMessage(error.message)
+      return
+    }
+
+    setDuels((items) => sortDuels([mapSupabaseDuel(data), ...items.filter((item) => item.id !== data.id)]))
     setMessage(`DRY_RUN=true: ${stake} USDC duel opened. No funds moved.`)
   }
 
-  function cancelDuel(duel: DuelListItem) {
+  async function cancelDuel(duel: DuelListItem) {
     if (wallet !== duel.playerA || duel.status !== "open") return
+
+    const supabase = getSupabaseDuelsClient()
+    if (!supabase) {
+      setMessage("Supabase env vars are missing. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.")
+      return
+    }
+
+    const { error } = await supabase.from("duels").delete().eq("id", duel.id).eq("creator_wallet", wallet).eq("status", "open")
+    if (error) {
+      setMessage(error.message)
+      return
+    }
 
     setDuels((items) => items.filter((item) => item.id !== duel.id))
     setMessage("Duel cancelled.")
@@ -90,11 +179,29 @@ export function DuelsClient() {
       return
     }
 
+    const supabase = getSupabaseDuelsClient()
+    if (!supabase) {
+      setMessage("Supabase env vars are missing. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.")
+      return
+    }
+
     setResolvingDuelId(duel.id)
-    setDuels((items) => items.map((item) => (item.id === duel.id ? { ...item, status: "resolving", playerB: wallet } : item)))
     setMessage("DRY_RUN=true: requesting Switchboard VRF dry-run resolution.")
 
     try {
+      const { data: resolvingDuel, error: resolvingError } = await supabase
+        .from("duels")
+        .update({ status: "resolving", acceptor_wallet: wallet })
+        .eq("id", duel.id)
+        .eq("status", "open")
+        .select()
+        .maybeSingle()
+
+      if (resolvingError) throw resolvingError
+      if (!resolvingDuel) throw new Error("This duel is no longer open.")
+
+      setDuels((items) => items.map((item) => (item.id === duel.id ? mapSupabaseDuel(resolvingDuel) : item)))
+
       const timestamp = new Date().toISOString()
       const resolution = await resolveDuelWithSwitchboardVrf({
         eventId: duel.eventId,
@@ -123,17 +230,30 @@ export function DuelsClient() {
       }
 
       const nextResults = [result, ...readJsonArray<DuelResult>(DUEL_RESULTS_KEY)].slice(0, 50)
-      setDuels((items) =>
-        items.map((item) =>
-          item.id === duel.id
-            ? { ...item, status: "settled", playerB: wallet, winnerWallet: resolution.winnerWallet }
-            : item,
-        ),
-      )
+      const { data: resolvedDuel, error: resolvedError } = await supabase
+        .from("duels")
+        .update({
+          status: "resolved",
+          acceptor_wallet: wallet,
+          winner_wallet: resolution.winnerWallet,
+          vrf_proof: resolution.vrfProof,
+          result_hash: resolution.resultHash,
+        })
+        .eq("id", duel.id)
+        .select()
+        .single()
+
+      if (resolvedError) throw resolvedError
+
+      setDuels((items) => items.map((item) => (item.id === duel.id ? mapSupabaseDuel(resolvedDuel) : item)))
       writeJsonArray(DUEL_RESULTS_KEY, nextResults)
       setMessage(resolution.winnerWallet === wallet ? "YOU WON 🏴‍☠️" : "YOU LOST")
     } catch (error) {
-      setDuels((items) => items.map((item) => (item.id === duel.id ? { ...item, status: "open", playerB: undefined } : item)))
+      await supabase
+        .from("duels")
+        .update({ status: "open", acceptor_wallet: null })
+        .eq("id", duel.id)
+        .eq("status", "resolving")
       setMessage(error instanceof Error ? error.message : "Switchboard VRF dry-run resolution failed.")
     } finally {
       setResolvingDuelId("")
@@ -159,20 +279,17 @@ export function DuelsClient() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        {[10, 50].map((stake) => (
-          <button
-            key={stake}
-            type="button"
-            onClick={() => startDuel(stake as DuelStake)}
-            className="rounded-2xl border border-border bg-card p-6 text-left transition-colors hover:border-primary"
-          >
-            <span className="font-display text-3xl uppercase text-primary">Start ${stake} Duel</span>
-            <span className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
-              <CheckCircle2 className="h-4 w-4 text-gold" />
-              {stake} USDC dry-run payment
-            </span>
-          </button>
-        ))}
+        <button
+          type="button"
+          onClick={() => startDuel(10)}
+          className="rounded-2xl border border-border bg-card p-6 text-left transition-colors hover:border-primary"
+        >
+          <span className="font-display text-3xl uppercase text-primary">Start $10 Duel</span>
+          <span className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
+            <CheckCircle2 className="h-4 w-4 text-gold" />
+            10 USDC dry-run payment
+          </span>
+        </button>
       </div>
 
       {message && (
