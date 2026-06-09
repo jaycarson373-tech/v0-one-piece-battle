@@ -8,6 +8,7 @@ import {
   VAULT_CARDS_REALTIME_FILTER,
   type VaultCardRow,
 } from "@/lib/supabase-duels"
+import { shortWallet } from "@/lib/duel-store"
 
 const tierClass: Record<string, string> = {
   COMMON: "border-muted-foreground text-muted-foreground",
@@ -33,9 +34,12 @@ const cardImages: Record<string, string> = {
   "Shanks - P-083 Tournament Promo": "/cards/card-005.png",
 }
 
+type VaultTab = "available" | "airdropped"
+
 export function VaultClient() {
   const [cards, setCards] = useState<VaultCardRow[]>([])
   const [message, setMessage] = useState("")
+  const [activeTab, setActiveTab] = useState<VaultTab>("available")
 
   const stats = useMemo(
     () => ({
@@ -46,6 +50,13 @@ export function VaultClient() {
       airdropped: cards.filter((card) => card.status === "airdropped").length,
     }),
     [cards],
+  )
+  const visibleCards = useMemo(
+    () =>
+      activeTab === "available"
+        ? cards.filter((card) => card.status === "available")
+        : cards.filter((card) => card.status === "airdropped" || card.status === "reserved"),
+    [activeTab, cards],
   )
 
   useEffect(() => {
@@ -119,12 +130,29 @@ export function VaultClient() {
         </div>
       )}
 
+      <div className="mt-8 inline-flex rounded-full border border-border bg-card p-1">
+        {(["available", "airdropped"] as VaultTab[]).map((tab) => (
+          <button
+            key={tab}
+            type="button"
+            onClick={() => setActiveTab(tab)}
+            className={`rounded-full px-5 py-2 text-sm font-bold transition-colors ${
+              activeTab === tab ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {tab === "available" ? "Available" : "Airdropped"}
+          </button>
+        ))}
+      </div>
+
       <div className="mt-10 rounded-2xl border border-border bg-card">
         <div className="divide-y divide-border">
-          {cards.length === 0 ? (
-            <div className="p-5 text-sm text-muted-foreground">Vault is being stocked. Check back soon.</div>
+          {visibleCards.length === 0 ? (
+            <div className="p-5 text-sm text-muted-foreground">
+              {activeTab === "available" ? "No available cards right now." : "No airdropped cards yet."}
+            </div>
           ) : (
-            cards.map((card) => (
+            visibleCards.map((card) => (
               <div key={card.id} className="grid gap-4 p-5 md:grid-cols-[96px_1fr_auto] md:items-center">
                 <CardImage card={card} />
                 <div className="grid gap-2 text-sm">
@@ -140,6 +168,11 @@ export function VaultClient() {
                   </div>
                   <div className="text-muted-foreground">Grade: {card.grade ?? "-"}</div>
                   <div className="text-muted-foreground">Status: {card.status}</div>
+                  {activeTab === "airdropped" && (
+                    <div className="text-muted-foreground">
+                      Assigned Wallet: {card.assigned_to ? shortWallet(card.assigned_to) : "-"}
+                    </div>
+                  )}
                 </div>
                 <div className="font-heading text-xl font-extrabold text-gold">{formatUsd(Number(card.value_usd))}</div>
               </div>

@@ -85,6 +85,27 @@ export function DuelsClient() {
   const settledDuels = duels.filter((duel) => duel.status === "settled")
 
   useEffect(() => {
+    if (!wallet) return
+
+    const latestSettledDuel = duels.find(
+      (duel) => duel.winnerWallet && (duel.playerA === wallet || duel.playerB === wallet),
+    )
+
+    if (!latestSettledDuel?.winnerWallet) return
+
+    if (latestSettledDuel.winnerWallet !== wallet) {
+      setClaimDuelId("")
+      setClaimMessage("")
+      setMessage("YOU LOST. Better luck next time pirate.")
+      return
+    }
+
+    const slab = getAssignedSlabCard(latestSettledDuel, proofLog, vaultCards)
+    setClaimDuelId(slab ? latestSettledDuel.id : "")
+    setMessage(slab ? formatWinnerMessage(slab) : "🏴‍☠️ YOU WON! Slab assignment is pending.")
+  }, [wallet, duels, proofLog, vaultCards])
+
+  useEffect(() => {
     const supabase = getSupabaseDuelsClient()
 
     if (!supabase) {
@@ -347,6 +368,13 @@ export function DuelsClient() {
             ? "🏴‍☠️ YOU WON! Slab assignment is pending."
             : "YOU LOST. Better luck next time pirate.",
       )
+      setMessage(
+        resolution.winnerWallet === wallet && slabAssignment.slab
+          ? formatWinnerMessage(slabAssignment.slab)
+          : resolution.winnerWallet === wallet
+            ? "🏴‍☠️ YOU WON! Slab assignment is pending."
+            : "YOU LOST. Better luck next time pirate.",
+      )
     } catch (error) {
       await supabase
         .from("duels")
@@ -493,6 +521,9 @@ export function DuelsClient() {
 }
 
 function getAssignedSlab(duel: DuelListItem, proofLog: ProofLogRow[], vaultCards: VaultCardRow[]) {
+  const card = getAssignedSlabCard(duel, proofLog, vaultCards)
+  if (card) return `${card.name} (${card.tier})`
+
   const proof = proofLog.find(
     (record) =>
       record.event_id === duel.eventId &&
@@ -501,6 +532,18 @@ function getAssignedSlab(duel: DuelListItem, proofLog: ProofLogRow[], vaultCards
 
   if (!proof?.slab_id) return "Pending"
 
-  const card = vaultCards.find((item) => item.id === proof.slab_id)
-  return card ? `${card.name} (${card.tier})` : proof.slab_id
+  return proof.slab_id
+}
+
+function getAssignedSlabCard(duel: DuelListItem, proofLog: ProofLogRow[], vaultCards: VaultCardRow[]) {
+  const proof = proofLog.find(
+    (record) => record.event_id === duel.eventId && record.event_type === "duel_slab_assignment" && record.slab_id,
+  )
+
+  if (!proof?.slab_id) return null
+  return vaultCards.find((item) => item.id === proof.slab_id) ?? null
+}
+
+function formatWinnerMessage(card: VaultCardRow) {
+  return `🏴‍☠️ YOU WON! A slab has been assigned — ${card.name} (${card.tier}). We will contact you to arrange shipment.`
 }
