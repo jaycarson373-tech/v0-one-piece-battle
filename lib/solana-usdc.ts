@@ -9,7 +9,6 @@ import { DRY_RUN, SOLANA_RPC_URL, TREASURY_WALLET, USDC_DECIMALS, USDC_MINT, typ
 type PhantomProvider = {
   publicKey?: { toString(): string }
   signTransaction?(transaction: Transaction): Promise<Transaction>
-  signAndSendTransaction?(transaction: Transaction): Promise<{ signature: string }>
 }
 
 export type DuelPaymentResult = {
@@ -27,10 +26,6 @@ function getPhantom(): PhantomProvider {
 
   if (DRY_RUN && !provider.signTransaction) {
     throw new Error("Phantom signTransaction is unavailable.")
-  }
-
-  if (!DRY_RUN && !provider.signAndSendTransaction) {
-    throw new Error("Phantom signAndSendTransaction is unavailable.")
   }
 
   return provider
@@ -81,10 +76,14 @@ export async function payDuelEntryUsdc(stake: DuelStake): Promise<DuelPaymentRes
     }
   }
 
-  const sent = await provider.signAndSendTransaction!(transaction)
+  const signedTransaction = await provider.signTransaction!(transaction)
+  const signature = await connection.sendRawTransaction(signedTransaction.serialize(), {
+    skipPreflight: false,
+    preflightCommitment: "confirmed",
+  })
   await connection.confirmTransaction(
     {
-      signature: sent.signature,
+      signature,
       blockhash,
       lastValidBlockHeight,
     },
@@ -93,13 +92,13 @@ export async function payDuelEntryUsdc(stake: DuelStake): Promise<DuelPaymentRes
 
   console.info("USDC duel payment confirmed", {
     stake,
-    signature: sent.signature,
+    signature,
     treasury: TREASURY_WALLET,
     mint: USDC_MINT,
   })
 
   return {
-    signature: sent.signature,
+    signature,
     dryRun: false,
     logs: [],
   }

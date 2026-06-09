@@ -24,6 +24,7 @@ import {
   type SupabaseDuelRow,
   type VaultCardRow,
 } from "@/lib/supabase-duels"
+import { subscribeWithBackoff } from "@/lib/supabase-realtime"
 import { resolveDuelWithSwitchboardVrf } from "@/lib/switchboard-vrf"
 import { payDuelEntryUsdc } from "@/lib/solana-usdc"
 import { assignAvailableSlab, settleDuelTreasuryReceipt } from "@/lib/vault-proof"
@@ -129,9 +130,12 @@ export function DuelsClient() {
       setDuels((data ?? []).map(mapSupabaseDuel))
     }
 
-    const channel = supabase
-      .channel(DUELS_REALTIME_CHANNEL)
-      .on("postgres_changes", DUELS_REALTIME_FILTER, (payload) => {
+    return subscribeWithBackoff({
+      supabase,
+      label: "duels",
+      onSubscribed: () => void loadDuels(),
+      createChannel: () =>
+        supabase.channel(DUELS_REALTIME_CHANNEL).on("postgres_changes", DUELS_REALTIME_FILTER, (payload) => {
         if (payload.eventType === "DELETE") {
           const deleted = payload.old as Partial<SupabaseDuelRow>
           setDuels((items) => items.filter((item) => item.id !== deleted.id))
@@ -143,15 +147,8 @@ export function DuelsClient() {
           const existing = items.filter((item) => item.id !== nextDuel.id)
           return sortDuels([nextDuel, ...existing])
         })
-      })
-      .subscribe((status) => {
-        if (status === "SUBSCRIBED") void loadDuels()
-        if (status === "CHANNEL_ERROR") setMessage("Supabase realtime subscription failed.")
-      })
-
-    return () => {
-      void supabase.removeChannel(channel)
-    }
+      }),
+    })
   }, [])
 
   useEffect(() => {
@@ -178,9 +175,12 @@ export function DuelsClient() {
       }
     }
 
-    const proofChannel = supabase
-      .channel(`${PROOF_LOG_REALTIME_CHANNEL}:duels-history`)
-      .on("postgres_changes", PROOF_LOG_REALTIME_FILTER, (payload) => {
+    const removeProofChannel = subscribeWithBackoff({
+      supabase,
+      label: "duels proof history",
+      onSubscribed: () => void loadHistoryData(),
+      createChannel: () =>
+        supabase.channel(`${PROOF_LOG_REALTIME_CHANNEL}:duels-history`).on("postgres_changes", PROOF_LOG_REALTIME_FILTER, (payload) => {
         if (payload.eventType === "DELETE") {
           const deleted = payload.old as Partial<ProofLogRow>
           setProofLog((items) => items.filter((item) => item.event_id !== deleted.event_id))
@@ -192,14 +192,14 @@ export function DuelsClient() {
           const existing = items.filter((item) => item.event_id !== nextProof.event_id)
           return [nextProof, ...existing].sort((a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp))
         })
-      })
-      .subscribe((status) => {
-        if (status === "SUBSCRIBED") void loadHistoryData()
-      })
+      }),
+    })
 
-    const vaultChannel = supabase
-      .channel(`${VAULT_CARDS_REALTIME_CHANNEL}:duels-history`)
-      .on("postgres_changes", VAULT_CARDS_REALTIME_FILTER, (payload) => {
+    const removeVaultChannel = subscribeWithBackoff({
+      supabase,
+      label: "duels vault history",
+      createChannel: () =>
+        supabase.channel(`${VAULT_CARDS_REALTIME_CHANNEL}:duels-history`).on("postgres_changes", VAULT_CARDS_REALTIME_FILTER, (payload) => {
         if (payload.eventType === "DELETE") {
           const deleted = payload.old as Partial<VaultCardRow>
           setVaultCards((items) => items.filter((item) => item.id !== deleted.id))
@@ -211,12 +211,12 @@ export function DuelsClient() {
           const existing = items.filter((item) => item.id !== nextCard.id)
           return [nextCard, ...existing]
         })
-      })
-      .subscribe()
+      }),
+    })
 
     return () => {
-      void supabase.removeChannel(proofChannel)
-      void supabase.removeChannel(vaultChannel)
+      removeProofChannel()
+      removeVaultChannel()
     }
   }, [])
 

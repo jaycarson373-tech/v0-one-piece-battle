@@ -9,6 +9,7 @@ import {
   type ProofLogRow,
 } from "@/lib/supabase-duels"
 import { shortWallet } from "@/lib/duel-store"
+import { subscribeWithBackoff } from "@/lib/supabase-realtime"
 
 export function ProofClient() {
   const [results, setResults] = useState<ProofLogRow[]>([])
@@ -37,9 +38,12 @@ export function ProofClient() {
       setResults(data ?? [])
     }
 
-    const channel = supabase
-      .channel(PROOF_LOG_REALTIME_CHANNEL)
-      .on("postgres_changes", PROOF_LOG_REALTIME_FILTER, (payload) => {
+    return subscribeWithBackoff({
+      supabase,
+      label: "proof log",
+      onSubscribed: () => void loadProof(),
+      createChannel: () =>
+        supabase.channel(PROOF_LOG_REALTIME_CHANNEL).on("postgres_changes", PROOF_LOG_REALTIME_FILTER, (payload) => {
         if (payload.eventType === "DELETE") {
           const deleted = payload.old as Partial<ProofLogRow>
           setResults((items) => items.filter((item) => item.event_id !== deleted.event_id))
@@ -51,15 +55,8 @@ export function ProofClient() {
           const existing = items.filter((item) => item.event_id !== nextProof.event_id)
           return [nextProof, ...existing].sort((a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp)).slice(0, 50)
         })
-      })
-      .subscribe((status) => {
-        if (status === "SUBSCRIBED") void loadProof()
-        if (status === "CHANNEL_ERROR") setMessage("Supabase proof realtime subscription failed.")
-      })
-
-    return () => {
-      void supabase.removeChannel(channel)
-    }
+      }),
+    })
   }, [])
 
   return (

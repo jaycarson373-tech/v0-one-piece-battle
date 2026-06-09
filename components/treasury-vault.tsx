@@ -14,6 +14,7 @@ import {
   type ProofLogRow,
   type VaultCardRow,
 } from "@/lib/supabase-duels"
+import { subscribeWithBackoff } from "@/lib/supabase-realtime"
 
 export function TreasuryVault() {
   const [cards, setCards] = useState<VaultCardRow[]>([])
@@ -62,9 +63,12 @@ export function TreasuryVault() {
       setProofLog(proofResponse.data ?? [])
     }
 
-    const vaultChannel = supabase
-      .channel(`${VAULT_CARDS_REALTIME_CHANNEL}:homepage-treasury`)
-      .on("postgres_changes", VAULT_CARDS_REALTIME_FILTER, (payload) => {
+    const removeVaultChannel = subscribeWithBackoff({
+      supabase,
+      label: "homepage treasury cards",
+      onSubscribed: () => void loadStats(),
+      createChannel: () =>
+        supabase.channel(`${VAULT_CARDS_REALTIME_CHANNEL}:homepage-treasury`).on("postgres_changes", VAULT_CARDS_REALTIME_FILTER, (payload) => {
         if (payload.eventType === "DELETE") {
           const deleted = payload.old as Partial<VaultCardRow>
           setCards((items) => items.filter((item) => item.id !== deleted.id))
@@ -73,24 +77,24 @@ export function TreasuryVault() {
 
         const nextCard = payload.new as VaultCardRow
         setCards((items) => [nextCard, ...items.filter((item) => item.id !== nextCard.id)])
-      })
-      .subscribe((status) => {
-        if (status === "SUBSCRIBED") void loadStats()
-      })
+      }),
+    })
 
-    const proofChannel = supabase
-      .channel(`${PROOF_LOG_REALTIME_CHANNEL}:homepage-treasury`)
-      .on("postgres_changes", PROOF_LOG_REALTIME_FILTER, (payload) => {
+    const removeProofChannel = subscribeWithBackoff({
+      supabase,
+      label: "homepage treasury proof",
+      createChannel: () =>
+        supabase.channel(`${PROOF_LOG_REALTIME_CHANNEL}:homepage-treasury`).on("postgres_changes", PROOF_LOG_REALTIME_FILTER, (payload) => {
         if (payload.eventType === "DELETE") return
 
         const proof = payload.new as ProofLogRow
         setProofLog((items) => [proof, ...items.filter((item) => item.event_id !== proof.event_id)])
-      })
-      .subscribe()
+      }),
+    })
 
     return () => {
-      void supabase.removeChannel(vaultChannel)
-      void supabase.removeChannel(proofChannel)
+      removeVaultChannel()
+      removeProofChannel()
     }
   }, [])
 
