@@ -6,8 +6,17 @@ import { Logo } from "./logo"
 import { navLinks } from "@/lib/data"
 import { WalletButton } from "@/components/wallet-button"
 
+const CONTRACT_ADDRESS = "4KvrMmVDWpmUvQsRxVnWS8RQkByJZqfYyfL3RpQNpump"
+
 export function SiteHeader() {
   const [open, setOpen] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  async function copyContractAddress() {
+    await navigator.clipboard.writeText(CONTRACT_ADDRESS)
+    setCopied(true)
+    window.setTimeout(() => setCopied(false), 1500)
+  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur">
@@ -41,9 +50,15 @@ export function SiteHeader() {
           >
             <XIcon className="h-4 w-4" />
           </a>
-          <span className="hidden rounded-full border border-border px-3 py-2 font-mono text-xs font-bold text-muted-foreground sm:inline-flex">
-            CA: TBA
-          </span>
+          <button
+            type="button"
+            onClick={copyContractAddress}
+            className="hidden cursor-pointer rounded-full border border-border px-3 py-2 font-mono text-xs font-bold text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
+            aria-label="Copy contract address"
+            title={CONTRACT_ADDRESS}
+          >
+            {copied ? "Copied" : `CA: ${CONTRACT_ADDRESS}`}
+          </button>
           <WalletButton className="hidden gap-2 rounded-full sm:inline-flex" />
           <button
             className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border lg:hidden"
