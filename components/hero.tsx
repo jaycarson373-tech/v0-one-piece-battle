@@ -47,7 +47,7 @@ export function Hero() {
           </p>
 
           <p className="mx-auto mt-3 max-w-xl text-pretty leading-relaxed text-muted-foreground lg:mx-0">
-            Enter a $10 duel. Challenge another pirate, accept an open duel, or enter the house arena.
+            Enter a $10 duel. Challenge another pirate or accept an open duel.
             Every battle is resolved through a provably fair randomness system, logged publicly, and displayed
             inside the Proof Terminal.
           </p>
@@ -100,7 +100,7 @@ export function Hero() {
             </a>
           </div>
           <p className="mt-3 text-xs text-muted-foreground">
-            $10 duels · Provably fair · Fees buy real cards for holder airdrops
+            $10 duels · Provably fair · 100% of fees buy real cards airdropped to holders
           </p>
         </div>
 
@@ -116,7 +116,7 @@ export function Hero() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/55" />
 
             <div className="absolute inset-x-0 top-3 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-gold">
-              Live Duel · $18 Pool
+              Live Duel · $20 Pool
             </div>
 
             {/* two duelers */}

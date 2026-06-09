@@ -31,14 +31,6 @@ export const duelTiers = [
     accent: "primary" as const,
     soon: false,
   },
-  {
-    stake: 0,
-    name: "House Duel",
-    tagline: "Coming soon. Duel against the vault when house liquidity is enabled.",
-    pool: 0,
-    accent: "gold" as const,
-    soon: true,
-  },
 ]
 
 export const duelFlow = [
@@ -83,11 +75,11 @@ export const treasurySplit = [
 ]
 
 export const cardTiers = [
-  { tier: "COMMON", note: "$15 cards", color: "var(--muted-foreground)" },
-  { tier: "RARE", note: "$20–$25 cards", color: "var(--ocean)" },
-  { tier: "EPIC", note: "$50 cards", color: "var(--gold)" },
-  { tier: "LEGENDARY", note: "$100+ cards", color: "var(--primary)" },
-  { tier: "MYTHIC", note: "grails & premium slabs", color: "var(--foreground)" },
+  { tier: "COMMON", note: "under $25", color: "var(--muted-foreground)" },
+  { tier: "RARE", note: "$25–$35", color: "var(--ocean)" },
+  { tier: "EPIC", note: "$35–$50", color: "var(--gold)" },
+  { tier: "LEGENDARY", note: "$50–$100", color: "var(--primary)" },
+  { tier: "MYTHIC", note: "$100+", color: "var(--foreground)" },
 ]
 
 // ---- Holder Airdrops ----
@@ -108,7 +100,7 @@ export const airdropFlow = [
   "Select winning wallet",
   "Select card from vault",
   "Post proof",
-  "Send card claim",
+  "Winner notified, card shipped manually",
 ]
 
 // ---- Dashboard Preview ----
@@ -119,7 +111,7 @@ export const dashboardPreview = [
   { label: "Treasury Balance", value: "—", accent: true },
   { label: "Cards in Vault", value: "—" },
   { label: "Next Holder Airdrop", value: "—" },
-  { label: "Fees Used for Cards", value: "—" },
+  { label: "Treasury Balance", value: "—" },
   { label: "Latest Duel Winner", value: "—" },
   { label: "Latest Airdrop Winner", value: "—" },
 ]
@@ -128,7 +120,7 @@ export const kotpHowSteps = [
   {
     step: "01",
     title: "Duel",
-    body: "Players enter $10 duels. One player creates the duel, another accepts, or later the house can accept.",
+    body: "Players enter $10 duels. One player creates the duel, and another accepts.",
   },
   {
     step: "02",
@@ -143,7 +135,7 @@ export const kotpHowSteps = [
   {
     step: "04",
     title: "Holder Drops",
-    body: "Every 30–60 minutes, a supply-weighted holder airdrop selects a wallet and a random card from the vault.",
+    body: "Every hour, a supply-weighted holder airdrop selects a wallet and a random card from the vault.",
   },
   {
     step: "05",
