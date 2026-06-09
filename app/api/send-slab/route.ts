@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import bs58 from "bs58"
 import { Keypair } from "@solana/web3.js"
-import { getAssetWithProof, mplBubblegum, transfer } from "@metaplex-foundation/mpl-bubblegum"
+import { transferV1 } from "@metaplex-foundation/mpl-core"
 import { createSignerFromKeypair, publicKey, signerIdentity } from "@metaplex-foundation/umi"
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults"
 import { fromWeb3JsKeypair } from "@metaplex-foundation/umi-web3js-adapters"
@@ -62,15 +62,15 @@ export async function POST(request: Request) {
   try {
     const treasury = readTreasuryKeypair()
     const rpcUrl = process.env.NEXT_PUBLIC_SOLANA_RPC_URL ?? "https://api.mainnet-beta.solana.com"
-    const umi = createUmi(rpcUrl).use(mplBubblegum())
+    const umi = createUmi(rpcUrl)
     const treasurySigner = createSignerFromKeypair(umi, fromWeb3JsKeypair(treasury))
     umi.use(signerIdentity(treasurySigner))
 
-    const assetWithProof = await getAssetWithProof(umi, publicKey(nftMintAddress))
-    const signature = await transfer(umi, {
-      ...assetWithProof,
-      leafOwner: treasurySigner,
-      newLeafOwner: publicKey(input.winnerWallet),
+    const signature = await transferV1(umi, {
+      asset: publicKey(nftMintAddress),
+      authority: treasurySigner,
+      payer: treasurySigner,
+      newOwner: publicKey(input.winnerWallet),
     }).sendAndConfirm(umi)
 
     console.info("Treasury NFT slab transfer confirmed", {
