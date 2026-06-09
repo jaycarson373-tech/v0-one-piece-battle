@@ -21,10 +21,15 @@ const PHYGITALS_URL = "https://www.phygitals.com/u/IceChallenger429"
 
 const cardImages: Record<string, string> = {
   "Luffy OP07-109": "/cards/card-001.png",
+  "Monkey D. Luffy - OP07-109 Super Rare": "/cards/card-001.png",
   "Luffy P-001 Promo": "/cards/card-002.png",
+  "Monkey D. Luffy - P-001 Promo C2E2": "/cards/card-002.png",
   "Ace Championship": "/cards/card-003.png",
+  "Portgas D. Ace - Championship 2023": "/cards/card-003.png",
   "Luffy P-022 Film Red": "/cards/card-004.png",
+  "Monkey D. Luffy - P-022 Film Red": "/cards/card-004.png",
   "Shanks P-083 Tournament": "/cards/card-005.png",
+  "Shanks - P-083 Tournament Promo": "/cards/card-005.png",
 }
 
 export function VaultClient() {
