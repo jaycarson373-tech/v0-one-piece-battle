@@ -17,7 +17,12 @@ import {
   USDC_MINT,
   WALLET_EVENT,
 } from "@/lib/duel-store"
-import { getSupabaseDuelsClient, type SupabaseDuelRow } from "@/lib/supabase-duels"
+import {
+  DUELS_REALTIME_CHANNEL,
+  DUELS_REALTIME_FILTER,
+  getSupabaseDuelsClient,
+  type SupabaseDuelRow,
+} from "@/lib/supabase-duels"
 import { resolveDuelWithSwitchboardVrf } from "@/lib/switchboard-vrf"
 
 type DuelListItem = OpenDuel & {
@@ -94,11 +99,9 @@ export function DuelsClient() {
       setDuels((data ?? []).map(mapSupabaseDuel))
     }
 
-    void loadDuels()
-
     const channel = supabase
-      .channel("kotp-duels")
-      .on("postgres_changes", { event: "*", schema: "public", table: "duels" }, (payload) => {
+      .channel(DUELS_REALTIME_CHANNEL)
+      .on("postgres_changes", DUELS_REALTIME_FILTER, (payload) => {
         if (payload.eventType === "DELETE") {
           const deleted = payload.old as Partial<SupabaseDuelRow>
           setDuels((items) => items.filter((item) => item.id !== deleted.id))
@@ -111,7 +114,10 @@ export function DuelsClient() {
           return sortDuels([nextDuel, ...existing])
         })
       })
-      .subscribe()
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") void loadDuels()
+        if (status === "CHANNEL_ERROR") setMessage("Supabase realtime subscription failed.")
+      })
 
     return () => {
       void supabase.removeChannel(channel)

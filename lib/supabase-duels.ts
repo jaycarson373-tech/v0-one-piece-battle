@@ -1,6 +1,8 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js"
 
 export type SupabaseDuelStatus = "open" | "resolving" | "resolved"
+export const DUELS_REALTIME_CHANNEL = "public:duels"
+export const DUELS_REALTIME_FILTER = { event: "*", schema: "public", table: "duels" } as const
 
 export type SupabaseDuelRow = {
   id: string
@@ -42,6 +44,15 @@ export function getSupabaseDuelsClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-  supabaseClient = supabaseUrl && supabaseAnonKey ? createClient<Database>(supabaseUrl, supabaseAnonKey) : null
+  supabaseClient =
+    supabaseUrl && supabaseAnonKey
+      ? createClient<Database>(supabaseUrl, supabaseAnonKey, {
+          realtime: {
+            params: {
+              eventsPerSecond: 10,
+            },
+          },
+        })
+      : null
   return supabaseClient
 }
