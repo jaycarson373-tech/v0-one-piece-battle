@@ -68,9 +68,8 @@ export async function POST(request: Request) {
 
     const signature = await transferV1(umi, {
       asset: publicKey(nftMintAddress),
-      authority: treasurySigner,
-      payer: treasurySigner,
       newOwner: publicKey(input.winnerWallet),
+      authority: umi.identity,
     }).sendAndConfirm(umi)
 
     console.info("Treasury NFT slab transfer confirmed", {
