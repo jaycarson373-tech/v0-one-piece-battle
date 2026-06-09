@@ -65,9 +65,11 @@ export async function POST(request: Request) {
     const umi = createUmi(rpcUrl)
     const treasurySigner = createSignerFromKeypair(umi, fromWeb3JsKeypair(treasury))
     umi.use(signerIdentity(treasurySigner))
+    const collectionAddress = await getAssetCollectionAddress(rpcUrl, nftMintAddress)
 
     const signature = await transferV1(umi, {
       asset: publicKey(nftMintAddress),
+      collection: collectionAddress ? publicKey(collectionAddress) : undefined,
       newOwner: publicKey(input.winnerWallet),
       authority: umi.identity,
     }).sendAndConfirm(umi)
@@ -77,6 +79,7 @@ export async function POST(request: Request) {
       slabId: input.slabId,
       winnerWallet: input.winnerWallet,
       nftMintAddress,
+      collectionAddress,
       signature: bs58.encode(signature.signature),
     })
 
@@ -136,6 +139,35 @@ function readTreasuryKeypair() {
   }
 
   return Keypair.fromSecretKey(secretKey)
+}
+
+async function getAssetCollectionAddress(rpcUrl: string, nftMintAddress: string) {
+  const response = await fetch(rpcUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      id: 1,
+      method: "getAsset",
+      params: { id: nftMintAddress },
+    }),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Helius getAsset failed with status ${response.status}.`)
+  }
+
+  const asset = await response.json()
+  const collectionAddress = asset.result?.grouping?.find(
+    (group: { group_key?: string; group_value?: string }) => group.group_key === "collection",
+  )?.group_value
+
+  console.log("MPL Core asset collection lookup", {
+    nftMintAddress,
+    collectionAddress: collectionAddress ?? null,
+  })
+
+  return collectionAddress
 }
 
 function getServerSupabaseClient() {
