@@ -62,7 +62,7 @@ export function WalletButton({ className }: { className?: string }) {
 
   return (
     <div className="relative">
-      <Button type="button" className={className} onClick={connectWallet}>
+      <Button type="button" className={`${className ?? ""} cursor-pointer`} onClick={connectWallet}>
         <Wallet className="h-4 w-4" />
         {wallet ? shortWallet(wallet) : status || "Connect Wallet"}
       </Button>
