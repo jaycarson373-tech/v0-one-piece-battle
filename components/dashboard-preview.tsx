@@ -3,8 +3,19 @@ import { dashboardPreview } from "@/lib/kotp"
 
 export function DashboardPreview() {
   return (
-    <section id="dashboard" className="border-b border-border">
-      <div className="mx-auto max-w-6xl px-4 py-14">
+    <section id="dashboard" className="relative overflow-hidden border-b border-border">
+      {/* minimal ship backdrop */}
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <img
+          src="/bg/ship-solo.png"
+          alt=""
+          aria-hidden="true"
+          className="h-full w-full object-cover object-center opacity-10"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/96 to-background" />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-6xl px-4 py-14">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-ocean">

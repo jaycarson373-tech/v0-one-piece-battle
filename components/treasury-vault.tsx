@@ -7,12 +7,12 @@ export function TreasuryVault() {
       {/* vault backdrop */}
       <div className="pointer-events-none absolute inset-0 z-0">
         <img
-          src="/images/op-treasure-battle.jpeg"
+          src="/bg/battle.png"
           alt=""
           aria-hidden="true"
-          className="h-full w-full object-cover object-center opacity-25"
+          className="h-full w-full object-cover object-center opacity-15"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/94 to-background" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 py-14">

@@ -29,8 +29,19 @@ function StatusBadge({ status }: { status: DuelStatus }) {
 
 export function LiveDuelArena() {
   return (
-    <section id="arena" className="border-b border-border">
-      <div className="mx-auto max-w-6xl px-4 py-14">
+    <section id="arena" className="relative overflow-hidden border-b border-border">
+      {/* fleet backdrop */}
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <img
+          src="/bg/fleet.png"
+          alt=""
+          aria-hidden="true"
+          className="h-full w-full object-cover object-center opacity-20"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/92 to-background" />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-6xl px-4 py-14">
         <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary">
           <Swords className="h-4 w-4" /> Live Duel Arena
         </div>

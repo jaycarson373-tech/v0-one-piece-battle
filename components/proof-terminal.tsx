@@ -26,8 +26,19 @@ function Field({ label, value, mono = true, color }: { label: string; value: str
 
 export function ProofTerminal() {
   return (
-    <section id="proof" className="border-b border-border">
-      <div className="mx-auto max-w-6xl px-4 py-14">
+    <section id="proof" className="relative overflow-hidden border-b border-border">
+      {/* coast backdrop */}
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <img
+          src="/bg/coast.png"
+          alt=""
+          aria-hidden="true"
+          className="h-full w-full object-cover object-center opacity-15"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/94 to-background" />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-6xl px-4 py-14">
         <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-ocean">
           <ShieldCheck className="h-4 w-4" /> Proof of Random
         </div>

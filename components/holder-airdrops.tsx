@@ -3,8 +3,19 @@ import { airdropStats, airdropFlow } from "@/lib/kotp"
 
 export function HolderAirdrops() {
   return (
-    <section id="airdrops" className="border-b border-border">
-      <div className="mx-auto max-w-6xl px-4 py-14">
+    <section id="airdrops" className="relative overflow-hidden border-b border-border">
+      {/* coast backdrop */}
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <img
+          src="/bg/coast.png"
+          alt=""
+          aria-hidden="true"
+          className="h-full w-full object-cover object-bottom opacity-15"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/94 to-background" />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-6xl px-4 py-14">
         <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary">
           <Gift className="h-4 w-4" /> Holder Card Airdrops
         </div>
