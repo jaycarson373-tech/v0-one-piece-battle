@@ -389,7 +389,7 @@ export function DuelsClient() {
       setClaimDuelId(wonAssignedSlab ? duel.id : "")
       setMessage(
         wonAssignedSlab
-          ? `🏴‍☠️ YOU WON! A slab has been assigned to your wallet — ${slabAssignment.slab?.name} (${slabAssignment.slab?.tier}). We will contact you to arrange shipment.`
+          ? formatWinnerMessage(slabAssignment.slab as VaultCardRow)
           : resolution.winnerWallet === wallet
             ? "🏴‍☠️ YOU WON! Slab assignment is pending."
             : "YOU LOST. Better luck next time pirate.",
@@ -435,7 +435,7 @@ export function DuelsClient() {
         <button
           type="button"
           onClick={() => startDuel(10)}
-          className="rounded-2xl border border-border bg-card p-6 text-left transition-colors hover:border-primary"
+          className="cursor-pointer rounded-2xl border border-border bg-card p-6 text-left transition-colors hover:border-primary"
         >
           <span className="font-display text-3xl uppercase text-primary">Start $10 Duel</span>
           <span className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
@@ -448,18 +448,6 @@ export function DuelsClient() {
       {message && (
         <div className="mt-6 rounded-2xl border border-gold/40 bg-secondary p-4 text-sm font-medium text-foreground">
           {message}
-          {claimDuelId && (
-            <div className="mt-4 flex flex-col items-start gap-3">
-              <button
-                type="button"
-                onClick={() => setClaimMessage("We will contact you to arrange shipment.")}
-                className="rounded-full bg-primary px-5 py-2 text-sm font-bold text-primary-foreground"
-              >
-                Claim My Slab
-              </button>
-              {claimMessage && <div className="text-sm text-muted-foreground">{claimMessage}</div>}
-            </div>
-          )}
         </div>
       )}
 
@@ -497,7 +485,7 @@ export function DuelsClient() {
                   <button
                     type="button"
                     onClick={() => acceptDuel(duel)}
-                    className="rounded-full bg-primary px-5 py-2 text-sm font-bold text-primary-foreground"
+                    className="cursor-pointer rounded-full bg-primary px-5 py-2 text-sm font-bold text-primary-foreground"
                   >
                     Accept Duel
                   </button>
@@ -571,5 +559,5 @@ function getAssignedSlabCard(duel: DuelListItem, proofLog: ProofLogRow[], vaultC
 }
 
 function formatWinnerMessage(card: VaultCardRow) {
-  return `🏴‍☠️ YOU WON! A slab has been assigned — ${card.name} (${card.tier}). We will contact you to arrange shipment.`
+  return `🏴‍☠️ YOU WON! Check your wallet — ${card.name} (${card.tier}) has been sent directly to your wallet.`
 }
