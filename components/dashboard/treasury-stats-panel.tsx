@@ -8,6 +8,7 @@ import {
   VAULT_CARDS_REALTIME_FILTER,
   type VaultCardRow,
 } from "@/lib/supabase-duels"
+import { subscribeWithBackoff } from "@/lib/supabase-realtime"
 
 const PHYGITALS_URL =
   "https://www.phygitals.com/u/IceChallenger429/cards?priceRange=%2C&fmvRange=%2C&category=Pokemon%2COne+Piece%2CBasketball%2CBaseball%2CFootball%2CSoccer%2CYu-Gi-Oh%21%2CRiftbound%2CDragon+Ball%2CFwog%2CNEUKO%2CVibes%2CMoonbirds&gradeType=&listing=All+Items"
@@ -26,9 +27,12 @@ export function TreasuryStatsPanel() {
       setCards(data ?? [])
     }
 
-    const channel = supabase
-      .channel(`${VAULT_CARDS_REALTIME_CHANNEL}:dashboard-treasury`)
-      .on("postgres_changes", VAULT_CARDS_REALTIME_FILTER, (payload) => {
+    return subscribeWithBackoff({
+      supabase,
+      label: "dashboard treasury cards",
+      onSubscribed: () => void loadCards(),
+      createChannel: () =>
+        supabase.channel(`${VAULT_CARDS_REALTIME_CHANNEL}:dashboard-treasury`).on("postgres_changes", VAULT_CARDS_REALTIME_FILTER, (payload) => {
         if (payload.eventType === "DELETE") {
           const deleted = payload.old as Partial<VaultCardRow>
           setCards((items) => items.filter((item) => item.id !== deleted.id))
@@ -37,14 +41,8 @@ export function TreasuryStatsPanel() {
 
         const nextCard = payload.new as VaultCardRow
         setCards((items) => [nextCard, ...items.filter((item) => item.id !== nextCard.id)])
-      })
-      .subscribe((status) => {
-        if (status === "SUBSCRIBED") void loadCards()
-      })
-
-    return () => {
-      void supabase.removeChannel(channel)
-    }
+      }),
+    })
   }, [])
 
   return (

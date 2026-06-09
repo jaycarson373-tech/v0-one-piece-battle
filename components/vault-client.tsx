@@ -9,6 +9,7 @@ import {
   type VaultCardRow,
 } from "@/lib/supabase-duels"
 import { shortWallet } from "@/lib/duel-store"
+import { subscribeWithBackoff } from "@/lib/supabase-realtime"
 
 const tierClass: Record<string, string> = {
   COMMON: "border-muted-foreground text-muted-foreground",
@@ -81,9 +82,12 @@ export function VaultClient() {
       setCards(data ?? [])
     }
 
-    const channel = supabase
-      .channel(VAULT_CARDS_REALTIME_CHANNEL)
-      .on("postgres_changes", VAULT_CARDS_REALTIME_FILTER, (payload) => {
+    return subscribeWithBackoff({
+      supabase,
+      label: "vault cards",
+      onSubscribed: () => void loadCards(),
+      createChannel: () =>
+        supabase.channel(VAULT_CARDS_REALTIME_CHANNEL).on("postgres_changes", VAULT_CARDS_REALTIME_FILTER, (payload) => {
         if (payload.eventType === "DELETE") {
           const deleted = payload.old as Partial<VaultCardRow>
           setCards((items) => items.filter((item) => item.id !== deleted.id))
@@ -95,15 +99,8 @@ export function VaultClient() {
           const existing = items.filter((item) => item.id !== nextCard.id)
           return [nextCard, ...existing].sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at))
         })
-      })
-      .subscribe((status) => {
-        if (status === "SUBSCRIBED") void loadCards()
-        if (status === "CHANNEL_ERROR") setMessage("Supabase vault realtime subscription failed.")
-      })
-
-    return () => {
-      void supabase.removeChannel(channel)
-    }
+      }),
+    })
   }, [])
 
   return (
