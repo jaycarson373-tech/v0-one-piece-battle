@@ -12,9 +12,9 @@ export function HowItWorks() {
           src="/bg/fleet.png"
           alt=""
           aria-hidden="true"
-          className="h-full w-full object-cover object-center opacity-20"
+          className="h-full w-full object-cover object-center opacity-40"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/92 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/65 to-background" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 py-16">

@@ -10,9 +10,9 @@ export function DashboardPreview() {
           src="/bg/ship-solo.png"
           alt=""
           aria-hidden="true"
-          className="h-full w-full object-cover object-center opacity-10"
+          className="h-full w-full object-cover object-center opacity-30"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/96 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/72 to-background" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 py-14">

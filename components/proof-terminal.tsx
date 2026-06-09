@@ -33,9 +33,9 @@ export function ProofTerminal() {
           src="/bg/coast.png"
           alt=""
           aria-hidden="true"
-          className="h-full w-full object-cover object-center opacity-15"
+          className="h-full w-full object-cover object-center opacity-35"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/94 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/70 to-background" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 py-14">

@@ -19,9 +19,9 @@ export function Hero() {
           aria-hidden="true"
           className="h-full w-full object-cover object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/75 to-background" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/85 via-background/45 to-background/85" />
-        <div className="slash-lines absolute inset-0 opacity-50" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/55 via-background/45 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/70 via-transparent to-background/30" />
+        <div className="slash-lines absolute inset-0 opacity-40" />
       </div>
 
       <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-14 sm:pt-20 lg:grid-cols-[1.1fr_0.9fr]">
