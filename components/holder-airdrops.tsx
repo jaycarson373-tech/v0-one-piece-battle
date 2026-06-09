@@ -1,8 +1,91 @@
+"use client"
+
+import { useEffect, useMemo, useState, type ReactNode } from "react"
 import { Gift, Ticket } from "lucide-react"
-import { airdropStats, airdropFlow } from "@/lib/kotp"
+import { airdropFlow } from "@/lib/kotp"
 import { AirdropCountdown } from "@/components/airdrop-countdown"
+import { shortWallet } from "@/lib/duel-store"
+import {
+  getSupabaseDuelsClient,
+  PROOF_LOG_REALTIME_CHANNEL,
+  PROOF_LOG_REALTIME_FILTER,
+  VAULT_CARDS_REALTIME_CHANNEL,
+  VAULT_CARDS_REALTIME_FILTER,
+  type ProofLogRow,
+  type VaultCardRow,
+} from "@/lib/supabase-duels"
+import { subscribeWithBackoff } from "@/lib/supabase-realtime"
+
+const MOCK_ELIGIBLE_HOLDERS = 1284
 
 export function HolderAirdrops() {
+  const [proofLog, setProofLog] = useState<ProofLogRow[]>([])
+  const [vaultCards, setVaultCards] = useState<VaultCardRow[]>([])
+
+  useEffect(() => {
+    const supabase = getSupabaseDuelsClient()
+    if (!supabase) return
+
+    async function loadAirdropData() {
+      const [proofResponse, cardsResponse] = await Promise.all([
+        supabase
+          .from("proof_log")
+          .select("*")
+          .eq("event_type", "holder_airdrop")
+          .order("timestamp", { ascending: false }),
+        supabase.from("vault_cards").select("*").order("created_at", { ascending: false }),
+      ])
+
+      setProofLog(proofResponse.data ?? [])
+      setVaultCards(cardsResponse.data ?? [])
+    }
+
+    const removeProofChannel = subscribeWithBackoff({
+      supabase,
+      label: "airdrops proof log",
+      onSubscribed: () => void loadAirdropData(),
+      createChannel: () =>
+        supabase.channel(`${PROOF_LOG_REALTIME_CHANNEL}:airdrops-page`).on("postgres_changes", PROOF_LOG_REALTIME_FILTER, (payload) => {
+        if (payload.eventType === "DELETE") {
+          const deleted = payload.old as Partial<ProofLogRow>
+          setProofLog((items) => items.filter((item) => item.event_id !== deleted.event_id))
+          return
+        }
+
+        const proof = payload.new as ProofLogRow
+        if (proof.event_type !== "holder_airdrop") return
+
+        setProofLog((items) => {
+          const existing = items.filter((item) => item.event_id !== proof.event_id)
+          return [proof, ...existing].sort((a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp))
+        })
+      }),
+    })
+
+    const removeVaultChannel = subscribeWithBackoff({
+      supabase,
+      label: "airdrops vault cards",
+      createChannel: () =>
+        supabase.channel(`${VAULT_CARDS_REALTIME_CHANNEL}:airdrops-page`).on("postgres_changes", VAULT_CARDS_REALTIME_FILTER, (payload) => {
+        if (payload.eventType === "DELETE") {
+          const deleted = payload.old as Partial<VaultCardRow>
+          setVaultCards((items) => items.filter((item) => item.id !== deleted.id))
+          return
+        }
+
+        const card = payload.new as VaultCardRow
+        setVaultCards((items) => [card, ...items.filter((item) => item.id !== card.id)])
+      }),
+    })
+
+    return () => {
+      removeProofChannel()
+      removeVaultChannel()
+    }
+  }, [])
+
+  const stats = useMemo(() => buildAirdropStats(proofLog, vaultCards), [proofLog, vaultCards])
+
   return (
     <section id="airdrops" className="relative overflow-hidden border-b border-border">
       {/* coast backdrop */}
@@ -49,11 +132,11 @@ export function HolderAirdrops() {
 
           {/* airdrop stats */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {airdropStats.map((s) => (
+            {stats.map((s) => (
               <div key={s.label} className="flex flex-col justify-between rounded-2xl border border-border bg-card p-4">
                 <div className="text-[11px] uppercase tracking-wider text-muted-foreground">{s.label}</div>
                 <div className={`mt-3 font-heading text-xl font-extrabold ${s.accent ? "text-primary" : "text-foreground"}`}>
-                  {s.label === "Next Airdrop" ? <AirdropCountdown /> : s.value}
+                  {s.value}
                 </div>
               </div>
             ))}
@@ -62,4 +145,17 @@ export function HolderAirdrops() {
       </div>
     </section>
   )
+}
+
+function buildAirdropStats(proofLog: ProofLogRow[], vaultCards: VaultCardRow[]) {
+  const latestAirdrop = proofLog[0]
+  const latestCard = latestAirdrop?.slab_id ? vaultCards.find((card) => card.id === latestAirdrop.slab_id) : null
+
+  return [
+    { label: "Next Airdrop", value: <AirdropCountdown />, accent: true },
+    { label: "Last Winner", value: latestAirdrop?.winner_wallet ? shortWallet(latestAirdrop.winner_wallet) : "-" },
+    { label: "Card Won", value: latestCard ? latestCard.name : latestAirdrop?.slab_id ?? "-" },
+    { label: "Total Airdrops", value: proofLog.length.toString() },
+    { label: "Eligible Holders", value: MOCK_ELIGIBLE_HOLDERS.toLocaleString() },
+  ] satisfies { label: string; value: ReactNode; accent?: boolean }[]
 }

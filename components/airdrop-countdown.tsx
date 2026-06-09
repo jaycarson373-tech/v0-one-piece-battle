@@ -4,16 +4,14 @@ import { useEffect, useState } from "react"
 import { AIRDROP_INTERVAL_MS } from "@/lib/duel-store"
 
 export function AirdropCountdown() {
-  const [remaining, setRemaining] = useState(AIRDROP_INTERVAL_MS)
+  const [remaining, setRemaining] = useState(() => getMsUntilNextHour())
 
   useEffect(() => {
-    let nextAt = Date.now() + AIRDROP_INTERVAL_MS
-
     const interval = window.setInterval(() => {
+      const nextAt = getNextHourAt()
       const nextRemaining = nextAt - Date.now()
 
       if (nextRemaining <= 0) {
-        nextAt = Date.now() + AIRDROP_INTERVAL_MS
         setRemaining(AIRDROP_INTERVAL_MS)
         return
       }
@@ -25,6 +23,17 @@ export function AirdropCountdown() {
   }, [])
 
   return <>{formatCountdown(remaining)}</>
+}
+
+function getMsUntilNextHour() {
+  return Math.max(0, getNextHourAt() - Date.now())
+}
+
+function getNextHourAt() {
+  const next = new Date()
+  next.setMinutes(0, 0, 0)
+  next.setHours(next.getHours() + 1)
+  return next.getTime()
 }
 
 export function formatCountdown(ms: number) {
