@@ -229,7 +229,8 @@ export function DuelsClient() {
     }
 
     setDuels((items) => sortDuels([mapSupabaseDuel(data), ...items.filter((item) => item.id !== data.id)]))
-    setMessage(`DRY_RUN=true: ${stake} USDC duel opened. No funds moved.`)
+    console.info("DRY_RUN=true: duel opened", { eventId: data.id, stake, wallet })
+    setMessage("Duel opened.")
   }
 
   async function cancelDuel(duel: DuelListItem) {
@@ -273,7 +274,7 @@ export function DuelsClient() {
     setResolvingDuelId(duel.id)
     setClaimMessage("")
     setClaimDuelId("")
-    setMessage("DRY_RUN=true: requesting Switchboard VRF dry-run resolution.")
+    setMessage("Resolving duel.")
 
     try {
       const { data: resolvingDuel, error: resolvingError } = await supabase
@@ -302,13 +303,6 @@ export function DuelsClient() {
         playerA: duel.playerA,
         playerB: wallet,
       })
-      const slabAssignment = await assignAvailableSlab({
-        eventId: duel.eventId,
-        eventType: "duel_slab_assignment",
-        winnerWallet: resolution.winnerWallet,
-        vrfProof: resolution.vrfProof,
-        resultHash: resolution.resultHash,
-      })
 
       const { data: resolvedDuel, error: resolvedError } = await supabase
         .from("duels")
@@ -325,15 +319,33 @@ export function DuelsClient() {
 
       if (resolvedError) throw resolvedError
 
+      const slabAssignment = await assignAvailableSlab({
+        eventId: resolvedDuel.id,
+        eventType: "duel_slab_assignment",
+        winnerWallet: resolution.winnerWallet,
+        vrfProof: resolution.vrfProof,
+        resultHash: resolution.resultHash,
+      })
+
       setDuels((items) => items.map((item) => (item.id === duel.id ? mapSupabaseDuel(resolvedDuel) : item)))
+      if (slabAssignment.slab) {
+        setVaultCards((items) => [
+          slabAssignment.slab as VaultCardRow,
+          ...items.filter((item) => item.id !== slabAssignment.slab?.id),
+        ])
+      }
+      setProofLog((items) => {
+        const existing = items.filter((item) => item.event_id !== slabAssignment.proof.event_id)
+        return [slabAssignment.proof, ...existing]
+      })
       const wonAssignedSlab = resolution.winnerWallet === wallet && Boolean(slabAssignment.slab)
       setClaimDuelId(wonAssignedSlab ? duel.id : "")
       setMessage(
         wonAssignedSlab
-          ? "🏴‍☠️ You won! Check your wallet — your slab has been assigned. We will ship it to you when you claim."
+          ? `🏴‍☠️ YOU WON! A slab has been assigned to your wallet — ${slabAssignment.slab?.name} (${slabAssignment.slab?.tier}). We will contact you to arrange shipment.`
           : resolution.winnerWallet === wallet
-            ? "YOU WON 🏴‍☠️"
-            : "YOU LOST",
+            ? "🏴‍☠️ YOU WON! Slab assignment is pending."
+            : "YOU LOST. Better luck next time pirate.",
       )
     } catch (error) {
       await supabase
@@ -341,7 +353,7 @@ export function DuelsClient() {
         .update({ status: "open", acceptor_wallet: null })
         .eq("id", duel.id)
         .eq("status", "resolving")
-      setMessage(error instanceof Error ? error.message : "Switchboard VRF dry-run resolution failed.")
+      setMessage(error instanceof Error ? error.message : "Switchboard VRF resolution failed.")
     } finally {
       setResolvingDuelId("")
     }
@@ -357,7 +369,7 @@ export function DuelsClient() {
           </div>
           <h1 className="font-display text-4xl uppercase text-foreground sm:text-5xl">Duels</h1>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            DRY_RUN=true. Duels are priced in USDC on Solana, but no real funds move in this mode.
+            Duels are priced in USDC on Solana.
           </p>
         </div>
         <div className="rounded-full border border-border bg-card px-4 py-2 font-mono text-xs text-muted-foreground">
@@ -374,7 +386,7 @@ export function DuelsClient() {
           <span className="font-display text-3xl uppercase text-primary">Start $10 Duel</span>
           <span className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
             <CheckCircle2 className="h-4 w-4 text-gold" />
-            10 USDC dry-run payment
+            10 USDC entry
           </span>
         </button>
       </div>
