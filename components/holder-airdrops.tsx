@@ -1,5 +1,6 @@
 import { Gift, Ticket } from "lucide-react"
 import { airdropStats, airdropFlow } from "@/lib/kotp"
+import { AirdropCountdown } from "@/components/airdrop-countdown"
 
 export function HolderAirdrops() {
   return (
@@ -23,7 +24,7 @@ export function HolderAirdrops() {
           Hold tokens. Win real cards.
         </h2>
         <p className="mt-3 max-w-2xl text-pretty leading-relaxed text-muted-foreground">
-          Every 30–60 minutes, the system selects a random holder and a random card from the vault. Holder odds
+          Every hour, the system selects a random holder and a random card from the vault. Holder odds
           are supply-weighted: every 100K tokens equals one ticket.
         </p>
 
@@ -52,7 +53,7 @@ export function HolderAirdrops() {
               <div key={s.label} className="flex flex-col justify-between rounded-2xl border border-border bg-card p-4">
                 <div className="text-[11px] uppercase tracking-wider text-muted-foreground">{s.label}</div>
                 <div className={`mt-3 font-heading text-xl font-extrabold ${s.accent ? "text-primary" : "text-foreground"}`}>
-                  {s.value}
+                  {s.label === "Next Airdrop" ? <AirdropCountdown /> : s.value}
                 </div>
               </div>
             ))}

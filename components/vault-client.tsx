@@ -17,7 +17,8 @@ const tierClass: Record<string, string> = {
   MYTHIC: "border-gold text-primary",
 }
 
-const PHYGITALS_URL = "https://www.phygitals.com/u/IceChallenger429"
+const PHYGITALS_URL =
+  "https://www.phygitals.com/u/IceChallenger429/cards?priceRange=%2C&fmvRange=%2C&category=Pokemon%2COne+Piece%2CBasketball%2CBaseball%2CFootball%2CSoccer%2CYu-Gi-Oh%21%2CRiftbound%2CDragon+Ball%2CFwog%2CNEUKO%2CVibes%2CMoonbirds&gradeType=&listing=All+Items"
 
 const cardImages: Record<string, string> = {
   "Luffy OP07-109": "/cards/card-001.png",
@@ -106,7 +107,7 @@ export function VaultClient() {
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <Stat label="Total Cards" value={stats.totalCards.toString()} />
-        <Stat label="Total Value" value={formatUsd(stats.totalValue)} />
+        <Stat label="Total Vault Value" value={formatUsd(stats.totalValue)} />
         <Stat label="Available" value={stats.available.toString()} />
         <Stat label="Reserved" value={stats.reserved.toString()} />
         <Stat label="Airdropped" value={stats.airdropped.toString()} />
@@ -159,11 +160,6 @@ export function VaultClient() {
         )}
       </div>
 
-      <div className="mt-6 text-center text-sm text-muted-foreground">
-        <a href={PHYGITALS_URL} target="_blank" rel="noreferrer" className="text-gold hover:text-primary">
-          Full inventory verified on Phygitals
-        </a>
-      </div>
     </section>
   )
 }

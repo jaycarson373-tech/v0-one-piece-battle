@@ -6,6 +6,7 @@ import { MyVault } from "@/components/dashboard/my-vault"
 import { BattleHistory } from "@/components/dashboard/battle-history"
 import { Leaderboard } from "@/components/dashboard/leaderboard"
 import { HolderAirdropPanel } from "@/components/dashboard/holder-airdrop-panel"
+import { TreasuryStatsPanel } from "@/components/dashboard/treasury-stats-panel"
 
 export default function DashboardPage() {
   return (
@@ -21,6 +22,7 @@ export default function DashboardPage() {
             </div>
             <div className="space-y-6">
               <HolderAirdropPanel />
+              <TreasuryStatsPanel />
               <RecordPanel />
               <Leaderboard />
             </div>

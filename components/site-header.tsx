@@ -24,8 +24,8 @@ export function SiteHeader() {
               className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               {link.label}
-              {link.label === "Arena" && (
-                <span className="ml-1 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-primary align-middle" />
+              {link.label === "Duels" && (
+                <span className="ml-1 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-red-500 align-middle" />
               )}
             </a>
           ))}
@@ -67,6 +67,9 @@ export function SiteHeader() {
                   className="block rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
                 >
                   {link.label}
+                  {link.label === "Duels" && (
+                    <span className="ml-1 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-red-500 align-middle" />
+                  )}
                 </a>
               </li>
             ))}

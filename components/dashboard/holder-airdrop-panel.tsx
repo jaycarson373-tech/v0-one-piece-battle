@@ -1,9 +1,10 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { Gift } from "lucide-react"
 import { AIRDROP_INTERVAL_MS, shortWallet } from "@/lib/duel-store"
 import { type AirdropState, readAirdropState, runHolderAirdropNow } from "@/lib/holder-airdrop"
+import { formatCountdown } from "@/components/airdrop-countdown"
 
 export function HolderAirdropPanel() {
   const [state, setState] = useState<AirdropState>(() => ({
@@ -14,9 +15,8 @@ export function HolderAirdropPanel() {
   }))
   const [now, setNow] = useState(Date.now())
   const [running, setRunning] = useState(false)
-  const [message, setMessage] = useState("")
 
-  const nextAirdropMs = useMemo(() => new Date(state.nextAirdropAt).getTime(), [state.nextAirdropAt])
+  const nextAirdropMs = new Date(state.nextAirdropAt).getTime()
   const countdown = Math.max(0, nextAirdropMs - now)
 
   useEffect(() => {
@@ -30,20 +30,21 @@ export function HolderAirdropPanel() {
 
   useEffect(() => {
     if (!running && countdown === 0) {
-      void runAirdrop()
+      void runHourlyAirdrop()
     }
   }, [countdown, running])
 
-  async function runAirdrop() {
+  async function runHourlyAirdrop() {
     setRunning(true)
-    setMessage("DRY_RUN=true: running holder snapshot and Switchboard VRF selection.")
 
     try {
-      const result = await runHolderAirdropNow()
+      await runHolderAirdropNow()
       setState(readAirdropState())
-      setMessage(`Airdrop proof posted: ${shortWallet(result.winnerWallet)} won ${result.cardName}.`)
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Holder airdrop failed.")
+    } catch {
+      setState((current) => ({
+        ...current,
+        nextAirdropAt: new Date(Date.now() + AIRDROP_INTERVAL_MS).toISOString(),
+      }))
     } finally {
       setRunning(false)
     }
@@ -65,17 +66,6 @@ export function HolderAirdropPanel() {
         <Metric label="Next Airdrop" value={formatCountdown(countdown)} />
         <Metric label="Last Event" value={state.lastEventId || "-"} />
       </div>
-
-      {message && <p className="mt-4 text-xs leading-relaxed text-muted-foreground">{message}</p>}
-
-      <button
-        type="button"
-        onClick={() => runAirdrop()}
-        disabled={running}
-        className="mt-5 w-full rounded-full bg-primary px-5 py-2 text-sm font-bold text-primary-foreground transition-colors hover:opacity-90 disabled:opacity-60"
-      >
-        {running ? "Running Airdrop" : "Run Holder Airdrop Now"}
-      </button>
     </div>
   )
 }
@@ -89,10 +79,3 @@ function Metric({ label, value }: { label: string; value: string }) {
   )
 }
 
-function formatCountdown(ms: number) {
-  const totalSeconds = Math.ceil(ms / 1000)
-  const minutes = Math.floor(totalSeconds / 60)
-  const seconds = totalSeconds % 60
-
-  return `${minutes}:${seconds.toString().padStart(2, "0")}`
-}
